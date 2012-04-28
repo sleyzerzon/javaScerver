@@ -1,0 +1,12 @@
+TODO: 
+
+HTTP/1.1 keep alive,
+chunked requests,
+Connection: close.
+100 Continue,
+format date GMT,
+If-Modified-Since:/If-Unmodified-Since: - accept three date formats , 304 not modified/412 Precondition Failed
+
+HTTP/1.0 accept no header, don't continue
+
+require host, accept absolute url
