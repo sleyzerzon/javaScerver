@@ -10,3 +10,7 @@ If-Modified-Since:/If-Unmodified-Since: - accept three date formats , 304 not mo
 HTTP/1.0 accept no header, don't continue
 
 require host, accept absolute url
+
+does it make sense that anyone can call, but everyone has to pickup through responsedirector?
+
+error handling should happen at lower levels in teh serverloop

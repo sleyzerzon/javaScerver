@@ -1,4 +1,4 @@
-package core;
+package serverCore;
 
 import java.util.Date;
 import java.util.HashMap;
