@@ -1,6 +1,5 @@
 package serverCore;
 
-import http.HttpRequest.HttpMethod;
 import http.HttpResponse.HttpStatus;
 
 import java.io.IOException;

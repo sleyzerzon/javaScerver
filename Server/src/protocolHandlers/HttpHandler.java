@@ -1,9 +1,9 @@
 package protocolHandlers;
 
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.NotHttpException;
-import http.HttpRequest.HttpMethod;
 import http.HttpResponse.HttpStatus;
 
 import java.io.IOException;

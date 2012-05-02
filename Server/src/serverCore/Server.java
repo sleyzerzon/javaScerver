@@ -48,7 +48,7 @@ public class Server implements Runnable {
 				port = 9002;
 			}
 			
-			try {
+			/*try {
 				//find eth0
 				ni = NetworkInterface.getByName("eth0");
 				Enumeration<InetAddress> a = ni.getInetAddresses();
@@ -60,7 +60,7 @@ public class Server implements Runnable {
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 			localIp = InetAddress.getByName("localhost");
 			myAddress = new InetSocketAddress(localIp, port);
 			System.out.println(myAddress);
