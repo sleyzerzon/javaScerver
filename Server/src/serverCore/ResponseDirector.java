@@ -1,5 +1,8 @@
 package serverCore;
 
+import http.HttpRequest.HttpMethod;
+import http.HttpResponse.HttpStatus;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -11,10 +14,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.nio.channels.SocketChannel;
 
-import requestHandlers.RequestHandler;
-import requestHandlers.HttpHandler;
-import serverCore.HttpRequest.HttpMethod;
-import serverCore.HttpResponse.HttpStatus;
+import protocolHandlers.HttpHandler;
+import protocolHandlers.InstanceController;
+import protocolHandlers.InstanceRegistry;
+import protocolHandlers.ProtocolHandler;
+
 
 
 /**
@@ -28,7 +32,7 @@ public class ResponseDirector implements Callee {
 	ConcurrentLinkedQueue<ReceivedData> queue;
 	ConcurrentHashMap<SelectionKey, ConnectionStatus> history;
 	HashSet<SelectionKey> trustedPeers;
-	RequestHandler localController;
+	ProtocolHandler localController;
 	private boolean isChief = false;
 	Server server;
 

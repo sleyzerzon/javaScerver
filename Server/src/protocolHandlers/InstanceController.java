@@ -1,12 +1,15 @@
-package serverCore;
+package protocolHandlers;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 
-import requestHandlers.RequestHandler;
+import serverCore.Caller;
+import serverCore.ReceivedData;
+import serverCore.Server;
 
-public class InstanceController implements Caller, RequestHandler {
+
+public class InstanceController implements Caller, ProtocolHandler {
 
 	InetSocketAddress registry;
 	

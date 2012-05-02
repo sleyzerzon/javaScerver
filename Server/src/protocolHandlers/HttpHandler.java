@@ -1,18 +1,22 @@
-package requestHandlers;
+package protocolHandlers;
+
+import http.HttpRequest;
+import http.HttpResponse;
+import http.NotHttpException;
+import http.HttpRequest.HttpMethod;
+import http.HttpResponse.HttpStatus;
 
 import java.io.IOException;
+import java.util.Map;
 
-import serverCore.HttpRequest;
-import serverCore.HttpResponse;
-import serverCore.NotHttpException;
+
 import serverCore.ReceivedData;
-import serverCore.HttpRequest.HttpMethod;
-import serverCore.HttpResponse.HttpStatus;
 
 
-public class HttpHandler implements RequestHandler {
+public class HttpHandler implements ProtocolHandler {
 
 	private int count = 1;
+	private Map<String, Controller> Routes;
 	@Override
 	public boolean parseData(ReceivedData d) {
 		System.out.println(count++);

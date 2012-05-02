@@ -1,10 +1,13 @@
-package serverCore;
+package protocolHandlers;
 
 import java.nio.channels.SelectionKey;
 
-import requestHandlers.RequestHandler;
+import serverCore.Caller;
+import serverCore.ReceivedData;
+import serverCore.Server;
 
-public class InstanceRegistry implements Caller, RequestHandler {
+
+public class InstanceRegistry implements Caller, ProtocolHandler {
 
 	@Override
 	public void run() {

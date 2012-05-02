@@ -1,4 +1,4 @@
-package serverCore;
+package http;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -101,13 +101,6 @@ public class HttpRequest {
 
 	public int getBodyLength() {
 		return bodyLength;
-	}
-
-	public static enum HttpMethod {
-		GET,
-		POST,
-		PUT,
-		DELETE,
 	}
 
 }

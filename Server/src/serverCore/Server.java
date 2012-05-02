@@ -34,50 +34,52 @@ public class Server implements Runnable {
 	ByteBuffer readBuff;
 	Callee receiver;
 	ConcurrentLinkedQueue<PendingAction> actionQueue;
-	String parentAddress;
+	InetSocketAddress parentAddress;
+	InetSocketAddress myAddress;
 
 	public Server(boolean isChief, String parentAddress) {
 		try {
-			this.parentAddress = parentAddress;
 			NetworkInterface ni;
+			InetAddress localIp = null;
+			actionQueue = new ConcurrentLinkedQueue<PendingAction>();
+			
+			if (!isChief) {
+				this.parentAddress = new InetSocketAddress(parentAddress, 9001);
+				port = 9002;
+			}
+			
 			try {
-
 				//find eth0
 				ni = NetworkInterface.getByName("eth0");
 				Enumeration<InetAddress> a = ni.getInetAddresses();
-				InetAddress i = null;
+
 				while (a.hasMoreElements()){
-					i = a.nextElement();
-					//if (i.IS THE IP ADDRESS??)
-					System.out.println(a.nextElement());
+					a.nextElement();
+					localIp = a.nextElement();
 				}
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
+			localIp = InetAddress.getByName("localhost");
+			myAddress = new InetSocketAddress(localIp, port);
+			System.out.println(myAddress);
 			selector = Selector.open();
 
-			if (!isChief){
-				port = 9002;
-			}
+			
 			//setup server listening socket
 			ServerSocketChannel serverSocket = ServerSocketChannel.open();
 			serverSocket.configureBlocking(false);
-			serverSocket.socket().bind(new InetSocketAddress(port));
+			serverSocket.socket().bind(myAddress);
 			serverSocket.register(selector, SelectionKey.OP_ACCEPT);
-
 			readBuff = ByteBuffer.allocate(8192);
 			writeBuff = ByteBuffer.allocate(8192);
 
 			//TODO: dependency inject
-			InetSocketAddress address = null;
-			if (!isChief) {
-				address = new InetSocketAddress(parentAddress, 9001);
-			}
-			receiver = new ResponseDirector(isChief, address, this);
+			receiver = new ResponseDirector(isChief, this.parentAddress, this);
 			new Thread(receiver).start();
-			actionQueue = new ConcurrentLinkedQueue<PendingAction>();
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -111,7 +113,7 @@ public class Server implements Runnable {
 				PendingAction a;
 				PendingWrite w;
 				PendingInitiate i;
-				
+
 				//do the actions
 				Iterator<PendingAction> queueIter = actionQueue.iterator();
 				while(queueIter.hasNext()) {
@@ -219,13 +221,13 @@ public class Server implements Runnable {
 		actionQueue.add(new PendingInitiate(sc, c));
 		selector.wakeup();
 	}
-	
+
 	private void connectSelection(SelectionKey key) throws IOException {
 		((SocketChannel)key.channel()).finishConnect();
 		Caller c = (Caller)key.attachment();
 		c.greetCounterparty(this, key);
 	}
-	
+
 	public void sleep(int milliseconds) {
 
 	}
