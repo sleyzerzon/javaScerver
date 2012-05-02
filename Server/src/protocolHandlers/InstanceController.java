@@ -1,8 +1,14 @@
 package protocolHandlers;
 
+import instanceProtocol.InstanceMethod;
+import instanceProtocol.InstanceRequest;
+import instanceProtocol.InstanceResponse;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
+
+import Controllers.SimpleController;
 
 import serverCore.Caller;
 import serverCore.ReceivedData;
@@ -36,9 +42,12 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	@Override
 	public void greetCounterparty(Server s, SelectionKey key) {
-		if (!registered)
-		s.sendData(key, "haha".getBytes(), false);
-
+		if (!registered) {
+			InstanceRequest request= new InstanceRequest();
+			request.setMethod(InstanceMethod.GREET);
+			request.setController(SimpleController.class);
+			s.sendData(key, request.getBytes(), false);
+		}
 	}
 
 	@Override

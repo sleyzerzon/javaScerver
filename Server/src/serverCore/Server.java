@@ -205,6 +205,8 @@ public class Server implements Runnable {
 	}
 
 	public void sendData(SelectionKey key, byte[] data, boolean terminate) {
+		if (data == null)
+			return;
 		actionQueue.add(new PendingWrite(key, data, terminate));
 		selector.wakeup();
 	}
