@@ -27,7 +27,6 @@ public class InstanceRegistry implements Caller, ProtocolHandler {
 	public boolean parseData(ReceivedData d) {
 		InstanceRequest request = new InstanceRequest();
 		request.fromBytes(d.data);
-		System.out.println(new String(d.data));
 		return false;
 	}
 

@@ -3,9 +3,12 @@ package instanceProtocol;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 import Controllers.SimpleController;
 
@@ -26,16 +29,20 @@ public class InstanceRequest {
 
 	public void fromBytes(byte[] data) {
 		// TODO Auto-generated method stub
+		System.out.println("data length:"+data.length);
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
 		InputStreamReader readMethod = new InputStreamReader(in);
-		int c;
+		char c;
+		int offset = 1;
 		try {
 			StringBuilder builder = new StringBuilder();
-			while(readMethod.ready() && (c =readMethod.read()) != 10) {
+			while(readMethod.ready() && (c = (char)readMethod.read()) != '\n') {
 				builder.append((char)c);
+				offset++;
 			}
+			
 			System.out.println(builder.toString());
-			return;
+			System.out.println(offset);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,7 +51,7 @@ public class InstanceRequest {
 		InstanceClassLoader cl = new InstanceClassLoader();
 		Class<? extends Controller> cont;
 		try {
-			cont = cl.parseController(in);
+			cont = cl.parseController(data, offset);
 			Controller controller = cont.newInstance();
 			System.out.println(controller.say());
 		} catch (ClassNotFoundException e) {
@@ -61,16 +68,18 @@ public class InstanceRequest {
 
 	public byte[] getBytes() {
 		// TODO Auto-generated method stub
-		byte[] m = (method.toString() + "\n").getBytes();
-		
+		byte[] m = (method.toString() + '\n').getBytes();
 
-		String className = controller.getName();  // e.g. "foo.Bar"
+		String className = controller.getSimpleName();  // e.g. "foo.Bar"
 		String resourceName = "/home/jack/214/gui/eclipse/javaScerver/bin/Controllers/" + className +".class"; 
 		System.out.println(resourceName);
-		InputStream is = controller.getClassLoader().getResourceAsStream(resourceName);
-		DataInputStream dis = new DataInputStream(is);
 		try {
-			byte[] c = new byte[is.available()];
+			File file = new File(resourceName);
+			InputStream is = new FileInputStream(file);
+			
+			DataInputStream dis = new DataInputStream(is);
+			byte[] c = new byte[(int) file.length()];
+			System.out.println("class length is:"+c.length);
 			dis.readFully(c);
 			byte[] all = new byte[m.length + c.length];
 			System.arraycopy(m, 0, all, 0, m.length);
@@ -85,6 +94,6 @@ public class InstanceRequest {
 
 	public void setController(Class<? extends Controller> controller) {
 		this.controller = controller;
-		
+
 	}
 }

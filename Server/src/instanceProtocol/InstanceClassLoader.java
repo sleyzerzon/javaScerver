@@ -8,23 +8,19 @@ import java.io.IOException;
 
 public class InstanceClassLoader extends ClassLoader {
 
-	public Class<Controller> parseController(ByteArrayInputStream in) throws ClassNotFoundException {
+	@SuppressWarnings("unchecked")
+	public Class<? extends Controller> parseController(byte[] data, int offset) throws ClassNotFoundException {
 
-		DataInputStream dataIn = new DataInputStream(in);
-		byte[] data = new byte[in.available()];
-		try{
-			dataIn.readFully(data);
-		} catch(IOException e) {
-			return null;
-		}
-		
 
-		Class<Controller> clazz = null;
-		System.out.println("URLClassLoader: Defining class...");
-		try { clazz = (Class<Controller>) defineClass("", data, 0, data.length);}
+		System.out.println("class length found:"+(data.length-offset));
+
+
+		Class<? extends Controller> clazz = null;
+		System.out.println("Defining class...");
+		try { clazz = (Class<? extends Controller>) defineClass(null, data, offset, data.length-offset);}
 		catch (ClassFormatError e)
 		{
-			throw new ClassNotFoundException();
+			e.printStackTrace();
 		}
 
 		return clazz;
