@@ -1,8 +1,7 @@
-package protocolHandlers;
+package http;
 
 import java.util.Set;
 
-import http.HttpMethod;
 
 public interface Controller {
 

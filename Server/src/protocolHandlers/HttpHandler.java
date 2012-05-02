@@ -1,10 +1,11 @@
 package protocolHandlers;
 
+import http.Controller;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.HttpStatus;
 import http.NotHttpException;
-import http.HttpResponse.HttpStatus;
 
 import java.io.IOException;
 import java.util.Map;

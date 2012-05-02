@@ -1,18 +1,12 @@
 package serverCore;
 
-import http.HttpResponse.HttpStatus;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.nio.channels.SocketChannel;
-
 import protocolHandlers.HttpHandler;
 import protocolHandlers.InstanceController;
 import protocolHandlers.InstanceRegistry;

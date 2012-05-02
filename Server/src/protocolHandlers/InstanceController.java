@@ -12,9 +12,11 @@ import serverCore.Server;
 public class InstanceController implements Caller, ProtocolHandler {
 
 	InetSocketAddress registry;
+	boolean registered;
 	
 	public InstanceController(InetSocketAddress inetSocketAddress) {
 		registry = inetSocketAddress;
+		registered = false;
 
 	}
 
@@ -34,6 +36,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	@Override
 	public void greetCounterparty(Server s, SelectionKey key) {
+		if (!registered)
 		s.sendData(key, "haha".getBytes(), false);
 
 	}
