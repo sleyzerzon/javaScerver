@@ -1,6 +1,8 @@
 package protocolHandlers;
 
 import instanceProtocol.InstanceRequest;
+import instanceProtocol.InstanceResponse;
+import instanceProtocol.InstanceStatus;
 
 import java.nio.channels.SelectionKey;
 
@@ -27,6 +29,9 @@ public class InstanceRegistry implements Caller, ProtocolHandler {
 	public boolean parseData(ReceivedData d) {
 		InstanceRequest request = new InstanceRequest();
 		request.fromBytes(d.data);
+		InstanceResponse response = new InstanceResponse();
+		response.setStatus(InstanceStatus.OK);
+		d.server.sendData(d.key, response.getBytes(), false);
 		return false;
 	}
 

@@ -45,15 +45,19 @@ public class InstanceController implements Caller, ProtocolHandler {
 		if (!registered) {
 			InstanceRequest request= new InstanceRequest();
 			request.setMethod(InstanceMethod.GREET);
-			request.setController(SimpleController.class);
+			request.setController(null);
 			s.sendData(key, request.getBytes(), false);
 		}
 	}
 
 	@Override
 	public boolean parseData(ReceivedData d) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!registered) {
+			InstanceResponse response = new InstanceResponse();
+			response.fromBytes(d.data);
+			System.out.println(response.getStatus());
+		}
+		return true;
 		
 	}
 
