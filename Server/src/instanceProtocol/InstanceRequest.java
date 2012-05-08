@@ -16,7 +16,7 @@ import http.Controller;
 
 public class InstanceRequest {
 
-	InstanceMethod method;
+	private InstanceMethod method;
 	private Class<? extends Controller> controller;
 
 	public InstanceRequest() {
@@ -27,8 +27,9 @@ public class InstanceRequest {
 		this.method = method;
 	}
 
-	public void fromBytes(byte[] data) {
+	public static InstanceRequest fromBytes(byte[] data) {
 		// TODO Auto-generated method stub
+		InstanceRequest request = new InstanceRequest();
 		System.out.println("data length:"+data.length);
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
 		InputStreamReader readMethod = new InputStreamReader(in);
@@ -40,30 +41,37 @@ public class InstanceRequest {
 				builder.append((char)c);
 				offset++;
 			}
-			
-			System.out.println(builder.toString());
-			System.out.println(offset);
+			request.method = InstanceMethod.valueOf(builder.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		InstanceClassLoader cl = new InstanceClassLoader();
-		Class<? extends Controller> cont;
-		try {
-			cont = cl.parseController(data, offset);
-			Controller controller = cont.newInstance();
-			System.out.println(controller.say());
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Class<? extends Controller> cont = null;
+		switch (request.method) {
+		case GREET:
+			
+			break;
+			
+		case HEARBEAT:
+			
+			break;
+			
+		case CONTROLLER:
+			InstanceClassLoader cl = new InstanceClassLoader();
+			try {
+				cont = cl.parseController(data, offset);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			break;
+
+		default:
+			break;
 		}
+		request.controller = cont;
+		
+		return request;
 	}
 
 	public byte[] getBytes() {
@@ -94,6 +102,13 @@ public class InstanceRequest {
 
 	public void setController(Class<? extends Controller> controller) {
 		this.controller = controller;
+	}
 
+	public Class<? extends Controller> getController() {
+		return controller;
+	}
+
+	public InstanceMethod getMethod() {
+		return method;
 	}
 }

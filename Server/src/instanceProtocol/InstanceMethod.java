@@ -3,6 +3,7 @@ package instanceProtocol;
 public enum InstanceMethod {
 
 	GREET,
-	HEARBEAT 
+	HEARBEAT, 
+	CONTROLLER 
 	
 }

@@ -19,7 +19,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	InetSocketAddress registry;
 	boolean registered;
-	
+
 	public InstanceController(InetSocketAddress inetSocketAddress) {
 		registry = inetSocketAddress;
 		registered = false;
@@ -42,19 +42,19 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	@Override
 	public void greetCounterparty(Server s, SelectionKey key) {
-		if (!registered) {
-			InstanceRequest request= new InstanceRequest();
-			request.setMethod(InstanceMethod.GREET);
-			request.setController(SimpleController.class);
-			s.sendData(key, request.getBytes(), false);
-		}
+		InstanceRequest request= new InstanceRequest();
+		request.setMethod(InstanceMethod.GREET);
+		request.setController(SimpleController.class);
+		s.sendData(key, request.getBytes(), false);
 	}
 
 	@Override
 	public boolean parseData(ReceivedData d) {
-		// TODO Auto-generated method stub
-		return false;
-		
+		if (!registered) {
+			InstanceResponse response = InstanceResponse.fromBytes(d.data);
+		} else {
+			
+		}
 	}
 
 }
