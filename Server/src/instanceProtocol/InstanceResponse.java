@@ -10,12 +10,19 @@ public class InstanceResponse {
 	private InstanceStatus status;
 	
 	public InstanceResponse() {
-		// TODO Auto-generated constructor stub
+		status = InstanceStatus.FAILED;
 	}
 
 	public void setStatus(InstanceStatus status) {
 		this.status = status;
 	}
+
+
+	public InstanceStatus getStatus() {
+		return status;
+	}
+
+
 	
 	public byte[] getBytes() {
 		return status.toString().getBytes();

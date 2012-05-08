@@ -36,7 +36,7 @@ public class ResponseDirector implements Callee {
 		this.isChief = isChief;
 		this.server = server;
 		if (isChief) {
-			localController = new InstanceRegistry();
+			localController = new InstanceRegistry(server);
 		} else {
 			localController = new InstanceController(inetSocketAddress);
 		}

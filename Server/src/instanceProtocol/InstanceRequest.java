@@ -1,18 +1,24 @@
 package instanceProtocol;
 
+import http.HttpMethod;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
+import Controllers.Controller;
 import Controllers.SimpleController;
 
-import http.Controller;
 
 public class InstanceRequest {
 
@@ -20,11 +26,8 @@ public class InstanceRequest {
 	private Class<? extends Controller> controller;
 
 	public InstanceRequest() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public void setMethod(InstanceMethod method) {
-		this.method = method;
+		method = null;
+		controller = null;
 	}
 
 	public static InstanceRequest fromBytes(byte[] data) {
@@ -78,26 +81,57 @@ public class InstanceRequest {
 		// TODO Auto-generated method stub
 		byte[] m = (method.toString() + '\n').getBytes();
 
-		String className = controller.getSimpleName();  // e.g. "foo.Bar"
-		String resourceName = "/home/jack/214/gui/eclipse/javaScerver/bin/Controllers/" + className +".class"; 
-		System.out.println(resourceName);
-		try {
-			File file = new File(resourceName);
-			InputStream is = new FileInputStream(file);
+		if (controller == null)
+			return m;
+
+		byte[] c = new byte[0];
+		switch (method) {
+
+		case CONTROLLER:
+			c = crunchitizeController();
+			break;
+
+		case GREET:
+			break;
 			
+		case HEARBEAT:
+			break;
+			
+		default:
+			break;
+		}
+		
+		byte[] all = new byte[m.length + c.length];
+		System.arraycopy(m, 0, all, 0, m.length);
+		if (c.length > 0)
+			System.arraycopy(c, 0, all, m.length, c.length);
+		
+		return all;
+
+	}
+
+	
+	private byte[] crunchitizeController(){
+		byte[] c;
+		URL path = Thread.currentThread().getContextClassLoader().getSystemResource(controller.getName().replaceAll("\\.", "\\\\")+".class");
+		try {
+			File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
+			FileInputStream is = new FileInputStream(file);
+
 			DataInputStream dis = new DataInputStream(is);
-			byte[] c = new byte[(int) file.length()];
+			c = new byte[(int) file.length()];
 			System.out.println("class length is:"+c.length);
 			dis.readFully(c);
-			byte[] all = new byte[m.length + c.length];
-			System.arraycopy(m, 0, all, 0, m.length);
-			System.arraycopy(c, 0, all, m.length, c.length);
-			return all;
+			return c;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+
+	return new byte[0];
 	}
 
 	public void setController(Class<? extends Controller> controller) {
@@ -110,5 +144,9 @@ public class InstanceRequest {
 
 	public InstanceMethod getMethod() {
 		return method;
+	}
+	
+	public void setMethod(InstanceMethod method) {
+		this.method = method;
 	}
 }

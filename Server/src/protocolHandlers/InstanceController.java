@@ -42,19 +42,25 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	@Override
 	public void greetCounterparty(Server s, SelectionKey key) {
-		InstanceRequest request= new InstanceRequest();
-		request.setMethod(InstanceMethod.GREET);
-		request.setController(SimpleController.class);
-		s.sendData(key, request.getBytes(), false);
+		if (!registered) {
+			InstanceRequest request= new InstanceRequest();
+			request.setMethod(InstanceMethod.GREET);
+			request.setController(null);
+			s.sendData(key, request.getBytes(), false);
+		}
 	}
 
 	@Override
 	public boolean parseData(ReceivedData d) {
 		if (!registered) {
+			//they are responding to your greeting
 			InstanceResponse response = InstanceResponse.fromBytes(d.data);
 		} else {
+			//they are calling you
 			
 		}
+		return true;
+
 	}
 
 }

@@ -1,10 +1,11 @@
 package instanceProtocol;
 
-import http.Controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+
+import Controllers.Controller;
 
 public class InstanceClassLoader extends ClassLoader {
 
@@ -20,7 +21,7 @@ public class InstanceClassLoader extends ClassLoader {
 		try { clazz = (Class<? extends Controller>) defineClass(null, data, offset, data.length-offset);}
 		catch (ClassFormatError e)
 		{
-			e.printStackTrace();
+			return null;
 		}
 
 		return clazz;
