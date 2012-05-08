@@ -4,6 +4,7 @@ public enum InstanceMethod {
 
 	GREET,
 	HEARBEAT, 
-	CONTROLLER 
+	CONTROLLER, 
+	SLEEP 
 	
 }

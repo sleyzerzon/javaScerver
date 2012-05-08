@@ -59,6 +59,7 @@ public class HttpHandler implements ProtocolHandler {
 		} else {
 			response = new HttpResponse();
 		}
+		//TODO: reponseDirector.acceptReponse
 		d.server.sendData(d.key, response.getBytes(), true);
 		return true;
 	}

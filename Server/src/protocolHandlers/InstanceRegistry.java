@@ -6,53 +6,69 @@ import instanceProtocol.InstanceResponse;
 import instanceProtocol.InstanceStatus;
 
 import java.nio.channels.SelectionKey;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import serverCore.Caller;
 import serverCore.ReceivedData;
-import serverCore.Server;
+import serverCore.ResponseDirector;
 
 
-public class InstanceRegistry implements Caller, ProtocolHandler {
+public class InstanceRegistry implements ProtocolHandler, Runnable {
 
-	Set<SelectionKey> slaves;
-	Server server;
+	private ConcurrentLinkedQueue<ReceivedData> queue;
+	Map<SelectionKey, Integer> instanceLatencies;
+	//TODO: think of a more expressive name than intermediary
+	ResponseDirector intermediary;
 
-	public InstanceRegistry(Server server) {
-		this.server = server;
-		slaves = new HashSet<SelectionKey>();
+	public InstanceRegistry(ResponseDirector intermediary) {
+		queue = new ConcurrentLinkedQueue<ReceivedData>();
+		this.intermediary = intermediary;
+		instanceLatencies = new HashMap<SelectionKey, Integer>();
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		//start connection 
-	}
-
-	@Override
-	public void greetCounterparty(Server s, SelectionKey key) {
-		// TODO Auto-generated method stub
-
+		ReceivedData r;
+		//eat from the queue of new instances
+		while(true) {
+			synchronized(queue){
+				while(queue.isEmpty()) {
+					try {
+						queue.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				r = queue.poll();
+			}
+			eatData(r);
+		}
+		//send heartbeat to get average latencies
+		//recalculate load balancing and update instances
 	}
 
 	@Override
 	public boolean parseData(ReceivedData d) {
-		if (slaves.contains(d.key)) {
+		queue.add(d);
+		return true;
+	}
+	
+	private void eatData(ReceivedData d) {
+		if (instanceLatencies.containsKey(d.key)) {
 			//they are responding
 		} else {
 			//they are greeting
 			InstanceRequest request = InstanceRequest.fromBytes(d.data);
 			InstanceResponse response = new InstanceResponse();
 			if (request.getMethod() == InstanceMethod.GREET) {
-				slaves.add(d.key);
+				instanceLatencies.put(d.key, 0);
 				response.setStatus(InstanceStatus.OK);
 			} else {
 				response.setStatus(InstanceStatus.FAILED);
 			}
-			server.sendData(d.key, response.getBytes(), false);
+			intermediary.acceptReponse(response, d, false);
+			
 		}
-		return true;
 	}
 
 

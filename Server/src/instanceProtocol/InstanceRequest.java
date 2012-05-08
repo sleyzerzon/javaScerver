@@ -53,13 +53,13 @@ public class InstanceRequest {
 		Class<? extends Controller> cont = null;
 		switch (request.method) {
 		case GREET:
-			
+
 			break;
-			
+
 		case HEARBEAT:
-			
+
 			break;
-			
+
 		case CONTROLLER:
 			InstanceClassLoader cl = new InstanceClassLoader();
 			try {
@@ -73,7 +73,7 @@ public class InstanceRequest {
 			break;
 		}
 		request.controller = cont;
-		
+
 		return request;
 	}
 
@@ -93,45 +93,47 @@ public class InstanceRequest {
 
 		case GREET:
 			break;
-			
+
 		case HEARBEAT:
 			break;
-			
+
 		default:
 			break;
 		}
-		
+
 		byte[] all = new byte[m.length + c.length];
 		System.arraycopy(m, 0, all, 0, m.length);
 		if (c.length > 0)
 			System.arraycopy(c, 0, all, m.length, c.length);
-		
+
 		return all;
 
 	}
 
-	
+
 	private byte[] crunchitizeController(){
 		byte[] c;
-		URL path = Thread.currentThread().getContextClassLoader().getSystemResource(controller.getName().replaceAll("\\.", "\\\\")+".class");
-		try {
-			File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
-			FileInputStream is = new FileInputStream(file);
+		if (controller != null) {
+			URL path = Thread.currentThread().getContextClassLoader().getSystemResource(controller.getName().replaceAll("\\.", "\\\\")+".class");
+			try {
+				File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
+				FileInputStream is = new FileInputStream(file);
 
-			DataInputStream dis = new DataInputStream(is);
-			c = new byte[(int) file.length()];
-			System.out.println("class length is:"+c.length);
-			dis.readFully(c);
-			return c;
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				DataInputStream dis = new DataInputStream(is);
+				c = new byte[(int) file.length()];
+				System.out.println("class length is:"+c.length);
+				dis.readFully(c);
+				return c;
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		}
 
-	return new byte[0];
+		return new byte[0];
 	}
 
 	public void setController(Class<? extends Controller> controller) {
@@ -145,7 +147,7 @@ public class InstanceRequest {
 	public InstanceMethod getMethod() {
 		return method;
 	}
-	
+
 	public void setMethod(InstanceMethod method) {
 		this.method = method;
 	}

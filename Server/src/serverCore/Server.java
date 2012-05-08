@@ -216,6 +216,14 @@ public class Server implements Runnable {
 		selector.wakeup();
 	}
 
+	/**
+	 * Initiate a connection in the future with address a
+	 * upon completion, c's greetCounterparty method will be called with the 
+	 * new selection key.
+	 * @param a
+	 * @param c
+	 * @throws IOException
+	 */
 	public void initiateConnection(InetSocketAddress a, Caller c) throws IOException {
 		SocketChannel sc = SocketChannel.open();
 		sc.configureBlocking(false);
