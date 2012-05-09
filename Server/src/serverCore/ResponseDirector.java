@@ -1,9 +1,11 @@
 package serverCore;
 
 
+import instanceProtocol.InstanceRequest;
 import instanceProtocol.InstanceResponse;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;
@@ -35,7 +37,6 @@ public class ResponseDirector implements Callee {
 	private HttpHandler httpHander;
 	private boolean isChief = false;
 	Server server;
-	private Object InstanceController;
 
 	public ResponseDirector(boolean isChief, InetSocketAddress master, Server server) {
 		queue = new ConcurrentLinkedQueue<ReceivedData>();
@@ -70,6 +71,8 @@ public class ResponseDirector implements Callee {
 				// TODO don't know what to do if died
 			}
 			//((InstanceController)localController).phoneHome(server); 
+		} else {
+			new Thread((InstanceRegistry)localController).start();
 		}
 		while(true) {
 			ReceivedData r = null;
@@ -88,7 +91,7 @@ public class ResponseDirector implements Callee {
 				if (trustedPeers.contains(r.key)) {
 					localController.parseData(r);
 				} else {
-					if (! (new HttpHandler().parseData(r))) {
+					if (! (httpHander.parseData(r))) {
 						localController.parseData(r);
 						registerPeer(r.key);
 					}
@@ -106,10 +109,20 @@ public class ResponseDirector implements Callee {
 	public void acceptReponse(InstanceResponse response, ReceivedData d, boolean b) {
 		server.sendData(d.key, response.getBytes(), b);
 	}
+	
+	public void makeRequest(InstanceRequest request, ReceivedData d, boolean b) {
+		server.sendData(d.key, request.getBytes(), b);
+	}
+	
+	public void makeRequest(InstanceRequest request, SelectionKey key, boolean b) {
+		server.sendData(key, request.getBytes(), b);
+	}
 
-	public boolean registerHttpRoute(Class<? extends Controller> controller) {
+	public boolean registerHttpRoute(Class<? extends Controller> controller, String path) {
 		try {
-			httpHander.registerController(controller.newInstance());
+			Controller c = controller.newInstance();
+			System.out.println(controller.getName()+":"+c.getResourcePath());
+			httpHander.registerController(c);
 		} catch (InstantiationException e) {
 			return false;
 		} catch (IllegalAccessException e) {

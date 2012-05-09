@@ -61,18 +61,18 @@ public class InstanceController implements Caller, ProtocolHandler {
 	}
 	
 	private void eatData(ReceivedData d) {
-		if (!registered) {
+		/*if (!registered) {
 			//they are responding to your greeting
 			InstanceResponse response = InstanceResponse.fromBytes(d.data);
 			System.out.println(response.getStatus());
 			registered = true;
-		} else {
+		} else { */
 			//they are calling you
 			InstanceRequest request = InstanceRequest.fromBytes(d.data);
 			InstanceResponse response = new InstanceResponse();
 			switch (request.getMethod()) {
 			case CONTROLLER:
-				if (intermediary.registerHttpRoute(request.getController())) {
+				if (intermediary.registerHttpRoute(request.getController(), "/")) {
 					response.setStatus(InstanceStatus.OK); 
 				} else {
 					response.setStatus(InstanceStatus.FAILED); 
@@ -93,7 +93,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 				break;
 			}
 			
-		}
+		//}
 	}
 
 	public InetSocketAddress getRegistry() {

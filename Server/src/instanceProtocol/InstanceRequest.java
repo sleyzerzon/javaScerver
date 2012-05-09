@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 import Controllers.Controller;
 import Controllers.SimpleController;
@@ -114,8 +115,12 @@ public class InstanceRequest {
 	private byte[] crunchitizeController(){
 		byte[] c;
 		if (controller != null) {
-			URL path = Thread.currentThread().getContextClassLoader().getSystemResource(controller.getName().replaceAll("\\.", "\\\\")+".class");
+			String systemSlash = System.getProperty("file.separator");//"/";//"\\\\";
+			String location = controller.getName().replaceAll("\\.", systemSlash)+".class";
+			System.out.println("location:" + location);
+			URL path = Thread.currentThread().getContextClassLoader().getSystemResource(location);
 			try {
+				System.out.println("controller path:" + path);
 				File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
 				FileInputStream is = new FileInputStream(file);
 

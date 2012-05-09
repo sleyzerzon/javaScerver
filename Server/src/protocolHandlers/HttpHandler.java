@@ -24,7 +24,7 @@ public class HttpHandler implements ProtocolHandler {
 
 	public HttpHandler() {
 		routes = new HashMap<String, Controller>();
-		registerController(new SimpleController());
+		//registerController(new SimpleController());
 	}
 	
 	public boolean registerController(Controller c) {
