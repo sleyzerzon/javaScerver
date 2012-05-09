@@ -3,9 +3,13 @@ package protocolHandlers;
 import instanceProtocol.InstanceMethod;
 import instanceProtocol.InstanceRequest;
 import instanceProtocol.InstanceResponse;
+import instanceProtocol.InstanceStats;
 import instanceProtocol.InstanceStatus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 
@@ -44,7 +48,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 			InstanceRequest request= new InstanceRequest();
 			request.setMethod(InstanceMethod.GREET);
 			request.setController(null);
-			
+
 			//TODO: abstract into responsedirector
 			s.sendData(key, request.getBytes(), false);
 		} else {
@@ -59,7 +63,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 		eatData(d); //TODO:put in queue
 		return true;
 	}
-	
+
 	private void eatData(ReceivedData d) {
 		/*if (!registered) {
 			//they are responding to your greeting
@@ -67,33 +71,51 @@ public class InstanceController implements Caller, ProtocolHandler {
 			System.out.println(response.getStatus());
 			registered = true;
 		} else { */
-			//they are calling you
-			InstanceRequest request = InstanceRequest.fromBytes(d.data);
-			InstanceResponse response = new InstanceResponse();
-			switch (request.getMethod()) {
-			case CONTROLLER:
-				if (intermediary.registerHttpRoute(request.getController(), "/")) {
-					response.setStatus(InstanceStatus.OK); 
-				} else {
-					response.setStatus(InstanceStatus.FAILED); 
-				}
-				break;
-				
-			case GREET:
-				response.setStatus(InstanceStatus.FAILED);
-				break;
-				
-			case HEARBEAT:
-				break;
-				
-			case SLEEP:
-				break;
-
-			default:
-				break;
+		//they are calling you
+		InstanceRequest request = InstanceRequest.fromBytes(d.data);
+		InstanceResponse response = new InstanceResponse();
+		switch (request.getMethod()) {
+		case CONTROLLER:
+			if (intermediary.registerHttpRoute(request.getController(), "/")) {
+				response.setStatus(InstanceStatus.OK); 
+			} else {
+				response.setStatus(InstanceStatus.FAILED); 
 			}
-			
+			break;
+
+		case GREET:
+			response.setStatus(InstanceStatus.FAILED);
+			break;
+
+		case HEARBEAT:
+			sendStats(d);
+			break;
+
+		case SLEEP:
+			break;
+
+		default:
+			break;
+		}
+
 		//}
+	}
+
+	private void sendStats(ReceivedData d) {
+		InstanceStats stats = intermediary.getStats();
+		InstanceResponse response = new InstanceResponse();
+		try {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutput out = new ObjectOutputStream(bos);
+			out.writeObject(stats);
+
+			response.setStatus(InstanceStatus.STATUS);
+			response.setBody(bos.toByteArray()); 
+		} catch (IOException e) {
+			
+		}
+
+		intermediary.acceptReponse(response, d, false);
 	}
 
 	public InetSocketAddress getRegistry() {

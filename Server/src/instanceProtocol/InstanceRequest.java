@@ -32,7 +32,7 @@ public class InstanceRequest {
 	}
 
 	public static InstanceRequest fromBytes(byte[] data) {
-		// TODO Auto-generated method stub
+
 		InstanceRequest request = new InstanceRequest();
 		System.out.println("data length:"+data.length);
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
@@ -115,7 +115,7 @@ public class InstanceRequest {
 	private byte[] crunchitizeController(){
 		byte[] c;
 		if (controller != null) {
-			String systemSlash = System.getProperty("file.separator");//"/";//"\\\\";
+			String systemSlash = System.getProperty("file.separator");
 			String location = controller.getName().replaceAll("\\.", systemSlash)+".class";
 			System.out.println("location:" + location);
 			URL path = Thread.currentThread().getContextClassLoader().getSystemResource(location);

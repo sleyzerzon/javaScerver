@@ -1,10 +1,12 @@
 package instanceProtocol;
 
-public class InstanceStats {
+import java.io.Serializable;
 
-	private int avgLatency;
-	private int requestsPerTime;
-	private int maxLatency;
+public class InstanceStats implements Serializable {
+
+	private long avgLatency;
+	private long requestsPerTime;
+	private long maxLatency;
 	
 	public static InstanceStats newInitiate() {
 		InstanceStats newInitiate = new InstanceStats();			
@@ -14,27 +16,33 @@ public class InstanceStats {
 		return newInitiate;
 	}
 
-	public int getAvgLatency() {
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return String.format("request count: %d, average latency: %d, max latency %d", requestsPerTime, avgLatency, maxLatency);
+	}
+	
+	public long getAvgLatency() {
 		return avgLatency;
 	}
 
-	public void setAvgLatency(int avgLatency) {
+	public void setAvgLatency(long avgLatency) {
 		this.avgLatency = avgLatency;
 	}
 
-	public int getRequestsPerTime() {
+	public long getRequestsPerTime() {
 		return requestsPerTime;
 	}
 
-	public void setRequestsPerTime(int requestsPerTime) {
+	public void setRequestsPerTime(long requestsPerTime) {
 		this.requestsPerTime = requestsPerTime;
 	}
 
-	public int getMaxLatency() {
+	public long getMaxLatency() {
 		return maxLatency;
 	}
 
-	public void setMaxLatency(int maxLatency) {
+	public void setMaxLatency(long maxLatency) {
 		this.maxLatency = maxLatency;
 	}
 

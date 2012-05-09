@@ -3,5 +3,6 @@ package instanceProtocol;
 public enum InstanceStatus {
 
 	OK,
-	FAILED
+	FAILED, 
+	STATUS
 }

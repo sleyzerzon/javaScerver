@@ -5,8 +5,10 @@ import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
 import http.NotHttpException;
+import instanceProtocol.InstanceStats;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,6 @@ public class HttpHandler implements ProtocolHandler {
 
 	@Override
 	public boolean parseData(ReceivedData d) {
-		System.out.println(count++);
 		HttpRequest request;
 		if (d == null)
 			return false;
@@ -62,6 +63,32 @@ public class HttpHandler implements ProtocolHandler {
 		//TODO: reponseDirector.acceptReponse
 		d.server.sendData(d.key, response.getBytes(), true);
 		return true;
+	}
+
+	public InstanceStats getStats() {
+		InstanceStats stats = new InstanceStats();
+		ArrayList<Long> latencies = new ArrayList<Long>();
+		long requestCount = 0;
+		long totalLatency = 0;
+		long maxLatency = 0;
+		for(Controller controller : routes.values()) {
+			latencies.addAll(controller.getLatencies());
+			requestCount += controller.getRequestCount();
+		}
+		for (Long latency : latencies) {
+			if (latency > maxLatency)
+				maxLatency = latency;
+			totalLatency += latency;
+		}
+		stats.setRequestsPerTime(requestCount);
+		if (requestCount > 0) {
+		stats.setAvgLatency(totalLatency/requestCount);
+		stats.setMaxLatency(maxLatency); 
+		} else {
+			stats.setAvgLatency(0);
+			stats.setMaxLatency(0); 
+		}
+		return stats;
 	}
 
 }

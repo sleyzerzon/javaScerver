@@ -3,6 +3,7 @@ package serverCore;
 
 import instanceProtocol.InstanceRequest;
 import instanceProtocol.InstanceResponse;
+import instanceProtocol.InstanceStats;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -130,6 +131,11 @@ public class ResponseDirector implements Callee {
 		}
 		return true;
 		
+	}
+
+	public InstanceStats getStats() {
+		// TODO Auto-generated method stub
+		return httpHander.getStats();
 	}
 
 }

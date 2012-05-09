@@ -1,5 +1,7 @@
 package Controllers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,10 +15,14 @@ public class SimpleController implements Controller {
 
 	final Set<HttpMethod> methods;
 	final String resourcePath;
-
+	private long requestCount;
+	private ArrayList<Long> latencies;
+	
 	public SimpleController() {
 		methods = new HashSet<HttpMethod>();
 		methods.add(HttpMethod.GET);
+		latencies = new ArrayList<Long>();
+		requestCount = 0;
 		resourcePath = "/";
 	}
 	@Override
@@ -31,6 +37,8 @@ public class SimpleController implements Controller {
 
 	@Override
 	public HttpResponse handleRequest(HttpRequest r) {
+		requestCount++;
+		long start = System.nanoTime();
 		HttpResponse response = new HttpResponse();
 		response.setStatus(HttpStatus.OK);
 		response.addHeader("Connection", "close");
@@ -46,7 +54,8 @@ public class SimpleController implements Controller {
 						"</body>" +
 						"</html>" +
 				"\r\n\r\n");
-		return response;
+		latencies.add(System.nanoTime() - start);
+		return response;		
 	}
 	
 	@Override
@@ -56,6 +65,16 @@ public class SimpleController implements Controller {
 					((Controller) o).getMethods().equals(getMethods());
 		}
 		else return false;
+	}
+	@Override
+	public Collection<? extends Long> getLatencies() {
+		// TODO Auto-generated method stub
+		return latencies;
+	}
+	@Override
+	public long getRequestCount() {
+		// TODO Auto-generated method stub
+		return requestCount;
 	}
 
 }
