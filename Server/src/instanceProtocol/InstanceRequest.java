@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import Controllers.Controller;
@@ -25,6 +26,7 @@ public class InstanceRequest {
 
 	private InstanceMethod method;
 	private Class<? extends Controller> controller;
+	private byte[] body;
 
 	public InstanceRequest() {
 		method = null;
@@ -34,7 +36,6 @@ public class InstanceRequest {
 	public static InstanceRequest fromBytes(byte[] data) {
 
 		InstanceRequest request = new InstanceRequest();
-		System.out.println("data length:"+data.length);
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
 		InputStreamReader readMethod = new InputStreamReader(in);
 		char c;
@@ -57,8 +58,9 @@ public class InstanceRequest {
 
 			break;
 
-		case HEARBEAT:
-
+		case HEARTBEAT:
+			request.body = new byte[data.length - offset];
+			System.arraycopy(data, offset, request.body, 0, request.body.length);
 			break;
 
 		case CONTROLLER:
@@ -82,8 +84,8 @@ public class InstanceRequest {
 		// TODO Auto-generated method stub
 		byte[] m = (method.toString() + '\n').getBytes();
 
-		if (controller == null)
-			return m;
+		//if (controller == null)
+			//return m;
 
 		byte[] c = new byte[0];
 		switch (method) {
@@ -95,7 +97,8 @@ public class InstanceRequest {
 		case GREET:
 			break;
 
-		case HEARBEAT:
+		case HEARTBEAT:
+			c = body;
 			break;
 
 		default:
@@ -143,6 +146,7 @@ public class InstanceRequest {
 
 	public void setController(Class<? extends Controller> controller) {
 		this.controller = controller;
+		body = crunchitizeController();
 	}
 
 	public Class<? extends Controller> getController() {
@@ -155,5 +159,24 @@ public class InstanceRequest {
 
 	public void setMethod(InstanceMethod method) {
 		this.method = method;
+	}
+
+	public void setBody(byte[] b) {
+		body = b;
+	}
+	
+	public byte[] getBody() {
+		return body;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof InstanceRequest))
+			return false;
+		InstanceRequest r = (InstanceRequest)obj;
+		if (r.method != method) return false;
+		if (r.method == InstanceMethod.CONTROLLER)
+			return r.controller.getCanonicalName().equals(controller.getCanonicalName());
+		return Arrays.equals(r.body, body);
 	}
 }

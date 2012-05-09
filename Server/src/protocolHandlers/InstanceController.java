@@ -87,7 +87,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 			response.setStatus(InstanceStatus.FAILED);
 			break;
 
-		case HEARBEAT:
+		case HEARTBEAT:
 			sendStats(d);
 			break;
 

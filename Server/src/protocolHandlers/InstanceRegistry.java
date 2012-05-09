@@ -26,14 +26,18 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 
 	private ConcurrentLinkedQueue<ReceivedData> queue;
 	Map<SelectionKey, InstanceStats> instanceLatencies;
+	Map<SelectionKey, Boolean> instanceResets;
 	//TODO: think of a more expressive name than intermediary
 	ResponseDirector intermediary;
-	public static final long timeout = 1000;
+	private static final long timeout = 1000;
+	private long avgRequestRate;
 
 	public InstanceRegistry(ResponseDirector intermediary) {
 		queue = new ConcurrentLinkedQueue<ReceivedData>();
 		this.intermediary = intermediary;
+		avgRequestRate = 0;
 		instanceLatencies = new HashMap<SelectionKey, InstanceStats>();
+		instanceResets = new HashMap<SelectionKey, Boolean>();
 	}
 
 	@Override
@@ -63,7 +67,8 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	 */
 	private void heartbeat() {
 		InstanceRequest request = new InstanceRequest();
-		request.setMethod(InstanceMethod.HEARBEAT);
+		request.setMethod(InstanceMethod.HEARTBEAT);
+		request.setBody("".getBytes());
 		for(SelectionKey key : instanceLatencies.keySet()){
 			intermediary.makeRequest(request, key, false);
 		}
