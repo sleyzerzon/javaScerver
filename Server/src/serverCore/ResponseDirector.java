@@ -138,4 +138,9 @@ public class ResponseDirector implements Callee {
 		return httpHander.getStats();
 	}
 
+	public void cullHttpConnections(long avgRequestRate) {
+		httpHander.cullHttpConnections(avgRequestRate);
+		
+	}
+
 }

@@ -76,5 +76,10 @@ public class SimpleController implements Controller {
 		// TODO Auto-generated method stub
 		return requestCount;
 	}
+	@Override
+	public void cullConnections(long avgRequestRate) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

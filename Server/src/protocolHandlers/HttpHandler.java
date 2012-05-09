@@ -91,4 +91,11 @@ public class HttpHandler implements ProtocolHandler {
 		return stats;
 	}
 
+	public void cullHttpConnections(long avgRequestRate) {
+		for(Controller controller : routes.values()) {
+			controller.cullConnections(avgRequestRate);
+		}
+		
+	}
+
 }

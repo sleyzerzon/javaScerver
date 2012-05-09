@@ -66,10 +66,16 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	 * sends request for updated performance stats to each dependent 
 	 */
 	private void heartbeat() {
-		InstanceRequest request = new InstanceRequest();
-		request.setMethod(InstanceMethod.HEARTBEAT);
-		request.setBody("".getBytes());
+		InstanceRequest request;
+
 		for(SelectionKey key : instanceLatencies.keySet()){
+			request = new InstanceRequest();
+			request.setMethod(InstanceMethod.HEARTBEAT);
+			boolean cull = false;
+			if (instanceResets.containsKey(key) && instanceResets.get(key))
+				cull = true;
+			String body = avgRequestRate + ":" + cull;
+			request.setBody(body.getBytes());
 			intermediary.makeRequest(request, key, false);
 		}
 
@@ -81,21 +87,11 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	 */
 	private void balanceLoad() {
 		//calculate load balance
-		InstanceRequest request = new InstanceRequest();
-		request.setController(SimpleController.class);
-		request.setMethod(InstanceMethod.CONTROLLER);
-		if (send) {
-			for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
-				if (entry.getValue().getRequestsPerTime() == 0)
-					System.out.println("out " + request.getMethod() + ": " + request.getController().getName());
-				intermediary.makeRequest(request, entry.getKey(), false);
-				send = false;
-			}
-		} else {
-			for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
-				System.out.println(entry.getValue());
-			}
+
+		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
+			System.out.println(entry.getValue());
 		}
+
 	}
 
 	@Override
@@ -125,6 +121,11 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			//InstanceResponse response = new InstanceResponse();
 			System.out.println("in " + request.getMethod());
 			instanceLatencies.put(d.key, InstanceStats.newInitiate());
+
+			request = new InstanceRequest();
+			request.setController(SimpleController.class);
+			request.setMethod(InstanceMethod.CONTROLLER);
+			intermediary.makeRequest(request, d, false);
 			/*if (request.getMethod() == InstanceMethod.GREET) {
 
 				response.setStatus(InstanceStatus.OK);

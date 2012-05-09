@@ -19,5 +19,7 @@ public interface Controller {
 	public Collection<? extends Long> getLatencies();
 
 	public long getRequestCount();
+
+	public void cullConnections(long avgRequestRate);
 	
 }
