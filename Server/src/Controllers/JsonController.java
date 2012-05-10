@@ -48,7 +48,6 @@ public class JsonController implements Controller{
 	@Override
 	public InstanceStats getStats() {
 		InstanceStats stats = new InstanceStats();
-		ArrayList<Long> latencies = new ArrayList<Long>();
 		long totalLatency = 0;
 		long maxLatency = 0;
 
@@ -87,16 +86,20 @@ public class JsonController implements Controller{
 		
 		InstanceStats stats = getStats();
 		
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		boolean dropHere = false;
-		if (drop &&((float)random.nextInt(100)) < (dropRatio* 100))
+		if (drop && random.nextBoolean())
 			dropHere = true;
 		
 		response.setMessage( 
 				"{ 'requests': '"+stats.getRequestsPerTime()+"', 'latency':'"+stats.getAvgLatency()+"', 'drop': '"+ dropHere +"' }");
 		
-		long time = System.nanoTime();
-		while(System.nanoTime() < time + (30000000)) //30 milliseconds
-			;
+		
 		return response;	
 	}
 	
@@ -110,6 +113,7 @@ public class JsonController implements Controller{
 	@Override
 	public void resetStats() {
 		latencies.clear();
+		requestCount = 0;
 	}
 
 }

@@ -137,7 +137,9 @@ public class ResponseDirector implements Callee {
 
 	public InstanceStats getStats() {
 		// TODO Auto-generated method stub
-		return httpHander.getStats();
+		InstanceStats stats = httpHander.getStats();
+				System.out.println("httpstats:"+stats);
+		return stats;
 	}
 
 	public void cullHttpConnections(long avgRequestRate, boolean enact) {

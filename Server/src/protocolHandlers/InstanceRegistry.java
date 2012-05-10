@@ -30,14 +30,14 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	Map<SelectionKey, Boolean> instanceResets;
 	//TODO: think of a more expressive name than intermediary
 	ResponseDirector intermediary;
-	private static final long timeout = 1000;
-	private long avgRequestRate;
+	private static final long timeout = 3000;
+	private Long avgRequestRate;
 	private InstanceRequest controllerRequest;
 
 	public InstanceRegistry(ResponseDirector intermediary) {
 		queue = new ConcurrentLinkedQueue<ReceivedData>();
 		this.intermediary = intermediary;
-		avgRequestRate = 0;
+		avgRequestRate = (long) 0;
 		instanceLatencies = new HashMap<SelectionKey, InstanceStats>();
 		instanceResets = new HashMap<SelectionKey, Boolean>();
 	}
@@ -76,10 +76,10 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 		for(SelectionKey key : instanceLatencies.keySet()){
 			request = new InstanceRequest();
 			request.setMethod(InstanceMethod.HEARTBEAT);
-			boolean cull = false;
+			Boolean cull = false;
 			if (instanceResets.containsKey(key) && instanceResets.get(key))
 				cull = true;
-			String body = avgRequestRate + ":" + cull;
+			String body = avgRequestRate.toString() + ":" + cull.toString();
 			request.setBody(body.getBytes());
 			intermediary.makeRequest(request, key, false);
 		}
@@ -92,18 +92,28 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	 */
 	private void balanceLoad() {
 		//calculate load balance
+		long requests = 0;
+		long avgRequestCount = 0;
 		long totalLatency = 0;
 		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
+			System.out.println(entry.getValue());
+			requests += entry.getValue().getRequestsPerTime();
 			totalLatency += entry.getValue().getAvgLatency();
 		}
-		if (totalLatency == 0)
+		if (requests == 0) {
+			System.out.println("empty all around");
 			return;
+		}
 		avgRequestRate = totalLatency / instanceLatencies.size();
+		avgRequestCount = requests / instanceLatencies.size();
 		int i = 0;
 		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
-			System.out.println(i++ + ", " + entry.getValue());
-			if (entry.getValue().getAvgLatency() > (2 * avgRequestRate))
+			InstanceStats stats = entry.getValue();
+			System.out.println(i++ + ", " + stats);
+			if (stats.getRequestsPerTime() > (1.4 * avgRequestCount)){
+				System.out.println("culling:"+i);
 				instanceResets.put(entry.getKey(), true);
+			}
 			else instanceResets.put(entry.getKey(), false);
 		}
 
@@ -137,6 +147,7 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			//InstanceResponse response = new InstanceResponse();
 			System.out.println("in " + request.getMethod());
 			instanceLatencies.put(d.key, InstanceStats.newInitiate());
+			System.out.println("initiated");
 			String address = new String(request.getBody());
 			System.out.println(address);
 			intermediary.acceptAddress(address);

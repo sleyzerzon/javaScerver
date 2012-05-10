@@ -176,9 +176,10 @@ public class Server implements Runnable {
 	}
 
 	private void writeToSelection(SelectionKey key) throws IOException {
-		//System.out.println("writing");
+		
 		PendingWrite w = (PendingWrite)key.attachment();
 		writeBuff.clear();
+		//System.out.println("writing:"+w.data.length);
 		writeBuff.put(w.data);
 		//System.out.println(w.data.length);
 		writeBuff.flip();
@@ -200,6 +201,7 @@ public class Server implements Runnable {
 			key.cancel();
 			//System.out.println("--CLOSED--");
 		} else {
+			//System.out.println("read:"+readBuff.position());
 			receiver.pickupCall(this, key, readBuff.array(), count);
 		}
 		return count;

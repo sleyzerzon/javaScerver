@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import Controllers.Controller;
+import Controllers.JsonController;
 import Controllers.SimpleController;
 
 
@@ -66,8 +67,11 @@ public class InstanceRequest {
 		case CONTROLLER:
 			
 			try {
-				System.out.println("data size:"+(data.length - offset));
+				System.out.println("total size:"+(data.length)+", method:"+ offset+", body:"+ (data.length-offset));
 				controller = new InstanceClassLoader().parseController(data, offset);
+				if (controller == null)
+					controller = JsonController.class;
+				//TODO: cheating :(
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -91,7 +95,7 @@ public class InstanceRequest {
 		switch (method) {
 
 		case CONTROLLER:
-			System.out.println("class length:"+body.length);
+			System.out.println("total length:"+(body.length+m.length)+", method length:"+(m.length)+", body length:"+(body.length));
 			c = body;
 			break;
 

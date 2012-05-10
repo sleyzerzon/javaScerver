@@ -42,15 +42,15 @@ public class HttpRequest {
 		method = HttpMethod.valueOf(requestLine[0]);
 		url = requestLine[1];
 		version = requestLine[2];
-		System.out.println("method:"+method);
-		System.out.println("resource:"+url);
-		System.out.println("version:"+version);
+		//System.out.println("method:"+method);
+		//System.out.println("resource:"+url);
+		//System.out.println("version:"+version);
 
 
 		//headers
 		//Header-name: w* value
 		HashMap<String, String> headersBuilder = new HashMap<String, String>();
-		System.out.println("\nheaders:");
+		//System.out.println("\nheaders:");
 		String[] header;
 		do {
 			builder = new StringBuilder();
@@ -64,17 +64,17 @@ public class HttpRequest {
 			header = builder.toString().split(":\\s+");
 			if (header.length == 2){
 				headersBuilder.put(header[0], header[1]);
-				System.out.println(header[0]+": "+header[1]);
+				//System.out.println(header[0]+": "+header[1]);
 			}
 		} while (header.length == 2);
 		//blank line
 
 		headers = Collections.unmodifiableMap(headersBuilder);
 		//body
-		System.out.println("\nbody:");
+		//System.out.println("\nbody:");
 		body = new byte[8192];
 		bodyLength = data.read(body);
-		System.out.println(bodyLength);
+		//System.out.println(bodyLength);
 
 
 	}

@@ -49,6 +49,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 				}
 				r = queue.poll();
 			}
+			
 			eatData(r);
 
 		}
@@ -104,6 +105,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 			} else {
 				response.setStatus(InstanceStatus.FAILED); 
 			}
+			//intermediary.acceptReponse(response, d, false);
 			break;
 
 		case GREET:
@@ -113,9 +115,9 @@ public class InstanceController implements Caller, ProtocolHandler {
 		case HEARTBEAT:
 			String[] heartBeat = new String(request.getBody()).split(":");
 			long avgRequestRate = Long.parseLong(heartBeat[0]);
-			boolean cull = Boolean.getBoolean(heartBeat[1]);
-			//System.out.println(avgRequestRate + ":" + cull);
-			//intermediary.cullHttpConnections(avgRequestRate, cull);
+			boolean cull = heartBeat[1].equalsIgnoreCase("true");
+			System.out.println("\n\n\n\n\n"+avgRequestRate + ":" + cull);
+			intermediary.cullHttpConnections(avgRequestRate, cull);
 			sendStats(d);
 			break;
 
