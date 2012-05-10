@@ -128,7 +128,8 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			}
 		} else {
 			//they are greeting
-			InstanceRequest request = InstanceRequest.fromBytes(d.data);
+			InstanceRequest request = new InstanceRequest();
+			request.fromBytes(d.data);
 			//InstanceResponse response = new InstanceResponse();
 			System.out.println("in " + request.getMethod());
 			instanceLatencies.put(d.key, InstanceStats.newInitiate());

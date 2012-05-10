@@ -33,9 +33,9 @@ public class InstanceRequest {
 		controller = null;
 	}
 
-	public static InstanceRequest fromBytes(byte[] data) {
+	public synchronized InstanceRequest fromBytes(byte[] data) {
 
-		InstanceRequest request = new InstanceRequest();
+		InstanceRequest request = this;
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
 		InputStreamReader readMethod = new InputStreamReader(in);
 		char c;
@@ -81,7 +81,7 @@ public class InstanceRequest {
 		return request;
 	}
 
-	public byte[] getBytes() {
+	public synchronized byte[] getBytes() {
 		// TODO Auto-generated method stub
 		byte[] m = (method.toString() + '\n').getBytes();
 
@@ -92,7 +92,7 @@ public class InstanceRequest {
 		switch (method) {
 
 		case CONTROLLER:
-			c = crunchitizeController();
+			c = body;
 			break;
 
 		case GREET:
@@ -123,14 +123,15 @@ public class InstanceRequest {
 			String systemSlash = System.getProperty("file.separator");
 			String location = controller.getName().replaceAll("\\.", systemSlash)+".class";
 			System.out.println("location:" + location);
-			URL path = Thread.currentThread().getContextClassLoader().getSystemResource(location);
+			//URL path = Thread.currentThread().getContextClassLoader().getSystemResource(location);
+			InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
 			try {
-				System.out.println("controller path:" + path);
-				File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
-				FileInputStream is = new FileInputStream(file);
+				//System.out.println("controller path:" + path);
+				//File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
+				//FileInputStream is = new FileInputStream(file);
 
-				DataInputStream dis = new DataInputStream(is);
-				c = new byte[(int) file.length()];
+				DataInputStream dis = new DataInputStream(stream);
+				c = new byte[dis.available()];
 				System.out.println("class length is:"+c.length);
 				dis.readFully(c);
 				return c;
@@ -146,7 +147,7 @@ public class InstanceRequest {
 		return new byte[0];
 	}
 
-	public void setController(Class<? extends Controller> controller) {
+	public synchronized void setController(Class<? extends Controller> controller) {
 		this.controller = controller;
 		body = crunchitizeController();
 	}

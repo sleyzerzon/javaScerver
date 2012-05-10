@@ -53,11 +53,13 @@ public class Server implements Runnable {
 			try {
 				//find eth0
 				ni = NetworkInterface.getByName("eth0");
+				if (ni == null)
+					ni = NetworkInterface.getByName("wlan0");
 				if (ni != null) {
 					Enumeration<InetAddress> a = ni.getInetAddresses();
 
 					while (a.hasMoreElements()){
-						a.nextElement();
+						//a.nextElement();
 						localIp = a.nextElement();
 					}
 				}

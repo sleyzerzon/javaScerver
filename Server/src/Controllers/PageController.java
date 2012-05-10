@@ -5,6 +5,7 @@ import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,12 +59,18 @@ public class PageController implements Controller {
 		for (Entry<String, String> e : queries.entrySet())
 			System.out.println(e.getKey() + ":" + e.getValue());
 		response.addHeader("Content-Type", "text/html");
-		URL in = this.getClass().getClassLoader().getResource("StaticPage.html");
-		File file = new File(in.getFile());
-		byte[] fileBody = new byte[(int) file.length()];
+		InputStream in = this.getClass().getClassLoader().getResourceAsStream("StaticPage.html");
+		//File file = new File(in.getFile());
+		
 		try {
-			FileInputStream fin = new FileInputStream(file);
-			fin.read(fileBody);
+			byte[] fileBody = new byte[in.available()];
+			DataInputStream dis = new DataInputStream(in);
+			//c = new byte[dis.available()];
+			//System.out.println("class length is:"+c.length);
+			dis.readFully(fileBody);
+			
+			//FileInputStream fin = new FileInputStream(file);
+			//fin.read(fileBody);
 			response.setBody(fileBody);
 		} catch (IOException e) {
 

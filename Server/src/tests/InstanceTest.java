@@ -26,7 +26,8 @@ public class InstanceTest {
 		InstanceRequest r = new InstanceRequest();
 		r.setMethod(InstanceMethod.HEARTBEAT);
 		r.setBody("happy days".getBytes());
-		InstanceRequest r2 = InstanceRequest.fromBytes(r.getBytes());
+		InstanceRequest r2 = new InstanceRequest();
+		r2.fromBytes(r.getBytes());
 		assertEquals(r.getMethod(), r2.getMethod());
 		assertEquals(new String(r.getBody()), new String(r2.getBody()));
 		assertEquals(r, r2);

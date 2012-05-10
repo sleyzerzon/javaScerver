@@ -92,7 +92,8 @@ public class InstanceController implements Caller, ProtocolHandler {
 			registered = true;
 		} else { */
 		//they are calling you
-		InstanceRequest request = InstanceRequest.fromBytes(d.data);
+		InstanceRequest request = new InstanceRequest();
+		request.fromBytes(d.data);
 		InstanceResponse response = new InstanceResponse();
 		switch (request.getMethod()) {
 		case CONTROLLER:
