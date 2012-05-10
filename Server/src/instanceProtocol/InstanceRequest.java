@@ -55,7 +55,8 @@ public class InstanceRequest {
 		Class<? extends Controller> cont = null;
 		switch (request.method) {
 		case GREET:
-
+			request.body = new byte[data.length - offset];
+			System.arraycopy(data, offset, request.body, 0, request.body.length);
 			break;
 
 		case HEARTBEAT:
@@ -95,6 +96,7 @@ public class InstanceRequest {
 			break;
 
 		case GREET:
+			c = body;
 			break;
 
 		case HEARTBEAT:

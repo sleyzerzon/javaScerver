@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -121,7 +122,9 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			//InstanceResponse response = new InstanceResponse();
 			System.out.println("in " + request.getMethod());
 			instanceLatencies.put(d.key, InstanceStats.newInitiate());
-
+			String address = new String(request.getBody());
+			System.out.println(address);
+			intermediary.acceptAddress(address);
 			request = new InstanceRequest();
 			request.setController(SimpleController.class);
 			request.setMethod(InstanceMethod.CONTROLLER);

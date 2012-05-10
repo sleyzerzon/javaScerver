@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+.instance 
+{
+	border-style:solid;
+	border-width:5px;
+	display: inline-block;
+}
+</style>
+
+<script type="text/javascript">
+
+var newInstance = function() {
+	var xhr = new XMLHttpRequest();
+	xhr.open("get", document.URL + "instance", true);
+	xhr.onload = function(){
+		var response = eval('('+xhr.responseText+')');	
+		document.getElementById("instanceName").innerHTML = response.instance;
+	};
+	xhr.send();
+	
+};
+window.onload = newInstance;
+
+</script>
+	
+</head>	
+
+<body>
+	
+
+	
+	<div class="instance">
+		instance: <span id="instanceName">name</span></br>
+		<button type="button" onclick="newInstance()"> reroute </button></br>
+		<span style="text-decoration: underline; ">stats:</span> </br>
+		latency: <span id="latency"> 0 </span> </br>
+		requests/time: <span id="perTime"> 0 </span> </br>
+		change request frequency:   (<button type="button"> + </button>)/(<button type="button"> - </button>) </br>
+	</div>
+
+</body>
+</html>
+	

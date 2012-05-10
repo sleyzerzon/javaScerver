@@ -37,7 +37,11 @@ public class ResponseDirector implements Callee {
 	ProtocolHandler localController;
 	private HttpHandler httpHander;
 	private boolean isChief = false;
-	Server server;
+	private Server server;
+
+	public Server getServer() {
+		return server;
+	}
 
 	public ResponseDirector(boolean isChief, InetSocketAddress master, Server server) {
 		queue = new ConcurrentLinkedQueue<ReceivedData>();
@@ -47,7 +51,7 @@ public class ResponseDirector implements Callee {
 		this.server = server;
 		
 		//TODO: could make more of these in threads to use cores
-		httpHander = new HttpHandler();
+		httpHander = new HttpHandler(isChief);
 		if (isChief) {
 			localController = new InstanceRegistry(this);
 		} else {
@@ -140,6 +144,11 @@ public class ResponseDirector implements Callee {
 
 	public void cullHttpConnections(long avgRequestRate) {
 		httpHander.cullHttpConnections(avgRequestRate);
+		
+	}
+
+	public void acceptAddress(String hostAddress) {
+		httpHander.acceptAddress(hostAddress);
 		
 	}
 

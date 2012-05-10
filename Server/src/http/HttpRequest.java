@@ -102,5 +102,25 @@ public class HttpRequest {
 	public int getBodyLength() {
 		return bodyLength;
 	}
-
+	
+	public String getFragment() {
+		return url.substring(url.lastIndexOf('#'));
+	}
+	
+	public Map<String, String> getQueries() {
+		//scheme://username:password@domain:port/path?query_string#fragment_id
+		HashMap<String, String> queries = new HashMap<String, String>();
+		String[] split = url.split("\\?");
+		if (split.length!=2)
+			return queries;
+		String queryString = split[1];
+		for (String query : queryString.split("&")) {
+			String[] querySplit = query.split("=");
+			if (querySplit.length != 2) 
+				continue;
+			queries.put(querySplit[0], querySplit[1]);
+		}
+			
+		return queries;
+	}
 }

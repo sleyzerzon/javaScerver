@@ -1,5 +1,6 @@
 package http;
 
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class HttpResponse {
 				response.append(e.getKey()+": "+e.getValue()+"\n");
 			}
 			
-			response.append("\r\n\r\n");
+			response.append("\r\n");
 			byte[] head = response.toString().getBytes();
 			byte[] result = new byte[head.length + body.length];
 			System.arraycopy(head, 0, result, 0, head.length);
@@ -71,8 +72,7 @@ public class HttpResponse {
 	 * @param message
 	 */
 	public void setMessage(String message) {
-		setBody(message.getBytes());
-		headers.put("Content-Type", "text/html");
+		setBody(message.getBytes());		
 	} 
 	
 	public void addHeader(String key, String value) {

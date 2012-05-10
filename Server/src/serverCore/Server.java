@@ -1,4 +1,6 @@
 package serverCore;
+import instanceProtocol.InstanceRequest;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +39,7 @@ public class Server implements Runnable {
 	InetSocketAddress parentAddress;
 	InetSocketAddress myAddress;
 
-	public Server(boolean isChief, String parentAddress) {
+	public Server(boolean isChief, String parentAddress, String myPort) {
 		try {
 			NetworkInterface ni;
 			InetAddress localIp = null;
@@ -45,7 +47,7 @@ public class Server implements Runnable {
 			
 			if (!isChief) {
 				this.parentAddress = new InetSocketAddress(parentAddress, 9001);
-				port = 9002;
+				port = Integer.valueOf(myPort);
 			}
 			
 			/*try {
@@ -88,21 +90,24 @@ public class Server implements Runnable {
 	public static void main(String[] args) {
 		boolean isChief = false;
 		String address = null;
+		String port = "9001";
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			System.out.println("is this the head server?");
 			if (reader.readLine().equals("y"))
 				isChief = true;
 			else {
-				System.out.println("what is the server address?");
+				System.out.println("what is the head server address?");
 				address = reader.readLine();
+				System.out.println("what is the server port?");
+				port = reader.readLine();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		new Thread(new Server(isChief, address)).start();
+		new Thread(new Server(isChief, address, port)).start();
 	}
 
 	@Override
@@ -240,5 +245,10 @@ public class Server implements Runnable {
 
 	public void sleep(int milliseconds) {
 
+	}
+
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return myAddress.toString();
 	}
 }

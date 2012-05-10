@@ -48,6 +48,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 			InstanceRequest request= new InstanceRequest();
 			request.setMethod(InstanceMethod.GREET);
 			request.setController(null);
+			request.setBody(intermediary.getServer().getAddress().getBytes());
 
 			//TODO: abstract into responsedirector
 			s.sendData(key, request.getBytes(), false);

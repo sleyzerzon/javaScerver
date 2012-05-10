@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Controllers.Controller;
+import Controllers.PageController;
 import Controllers.SimpleController;
 
 
@@ -23,17 +24,20 @@ public class HttpHandler implements ProtocolHandler {
 
 	private int count = 1;
 	private Map<String, Controller> routes;
+	private PageController pageController;
 
-	public HttpHandler() {
+	public HttpHandler(boolean isHead) {
 		routes = new HashMap<String, Controller>();
-		//registerController(new SimpleController());
+		if (isHead)
+			pageController = new PageController();
+		else pageController = null;
 	}
-	
+
 	public boolean registerController(Controller c) {
 		routes.put(c.getResourcePath(), c);
 		return true;
 	}
-	
+
 	public boolean deregisterController(Controller c) {
 		if (routes.containsValue(c))
 			routes.remove(c.getResourcePath());
@@ -54,11 +58,15 @@ public class HttpHandler implements ProtocolHandler {
 			return false;
 		}
 		HttpResponse response;
-		Controller c = routes.get(request.getUrl());
-		if (c != null && c.getMethods().contains(request.getMethod())) {
-			response = c.handleRequest(request);
+		if (pageController != null){
+			response = pageController.handleRequest(request);
 		} else {
-			response = new HttpResponse();
+			Controller c = routes.get(request.getUrl());
+			if (c != null && c.getMethods().contains(request.getMethod())) {
+				response = c.handleRequest(request);
+			} else {
+				response = new HttpResponse();
+			}
 		}
 		//TODO: reponseDirector.acceptReponse
 		d.server.sendData(d.key, response.getBytes(), true);
@@ -82,8 +90,8 @@ public class HttpHandler implements ProtocolHandler {
 		}
 		stats.setRequestsPerTime(requestCount);
 		if (requestCount > 0) {
-		stats.setAvgLatency(totalLatency/requestCount);
-		stats.setMaxLatency(maxLatency); 
+			stats.setAvgLatency(totalLatency/requestCount);
+			stats.setMaxLatency(maxLatency); 
 		} else {
 			stats.setAvgLatency(0);
 			stats.setMaxLatency(0); 
@@ -95,7 +103,15 @@ public class HttpHandler implements ProtocolHandler {
 		for(Controller controller : routes.values()) {
 			controller.cullConnections(avgRequestRate);
 		}
-		
+
+	}
+
+	public void removeAddress(String hostAddress) {
+		pageController.removeAddress(hostAddress);
+	}
+	public void acceptAddress(String hostAddress) {
+		pageController.acceptAddress(hostAddress);
+
 	}
 
 }
