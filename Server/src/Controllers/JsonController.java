@@ -75,6 +75,10 @@ public class JsonController implements Controller{
 		
 		response.setMessage( 
 				"{ 'requests': '"+requestCount+"', 'latency':'"+avgLatency+"', 'drop': '"+ dropHere +"' }");
+		
+		long time = System.nanoTime();
+		while(System.nanoTime() < time + (30000000))
+			;
 		return response;	
 	}
 	
