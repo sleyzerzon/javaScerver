@@ -75,10 +75,8 @@ public class ResponseDirector implements Callee {
 			} catch (IOException e) {
 				// TODO don't know what to do if died
 			}
-			//((InstanceController)localController).phoneHome(server); 
-		} else {
-			new Thread((InstanceRegistry)localController).start();
 		}
+		new Thread(localController).start();
 		while(true) {
 			ReceivedData r = null;
 			synchronized(queue){
@@ -125,7 +123,6 @@ public class ResponseDirector implements Callee {
 
 	public boolean registerHttpRoute(Class<? extends Controller> controller, String path) {
 		try {
-			System.out.println(controller+" shouldn't be null");
 			Controller c = controller.newInstance();
 			System.out.println(controller.getName()+":"+c.getResourcePath());
 			httpHander.registerController(c);

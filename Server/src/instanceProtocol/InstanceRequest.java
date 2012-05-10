@@ -27,7 +27,7 @@ public class InstanceRequest {
 	private InstanceMethod method;
 	private Class<? extends Controller> controller;
 	private byte[] body;
-
+	private static InstanceClassLoader cl = new InstanceClassLoader();
 	public InstanceRequest() {
 		method = null;
 		controller = null;
@@ -65,7 +65,7 @@ public class InstanceRequest {
 			break;
 
 		case CONTROLLER:
-			InstanceClassLoader cl = new InstanceClassLoader();
+			
 			try {
 				cont = cl.parseController(data, offset);
 			} catch (ClassNotFoundException e) {
@@ -151,7 +151,7 @@ public class InstanceRequest {
 		body = crunchitizeController();
 	}
 
-	public Class<? extends Controller> getController() {
+	public synchronized Class<? extends Controller> getController() {
 		return controller;
 	}
 
@@ -159,11 +159,11 @@ public class InstanceRequest {
 		return method;
 	}
 
-	public void setMethod(InstanceMethod method) {
+	public synchronized void setMethod(InstanceMethod method) {
 		this.method = method;
 	}
 
-	public void setBody(byte[] b) {
+	public synchronized void setBody(byte[] b) {
 		body = b;
 	}
 	

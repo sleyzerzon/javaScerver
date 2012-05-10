@@ -95,8 +95,9 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 		if (totalLatency == 0)
 			return;
 		avgRequestRate = totalLatency / instanceLatencies.size();
-		
+		int i = 0;
 		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
+			System.out.println(i++ + ", " + entry.getValue());
 			if (entry.getValue().getAvgLatency() > (2 * totalLatency))
 				instanceResets.put(entry.getKey(), true);
 			else instanceResets.put(entry.getKey(), false);

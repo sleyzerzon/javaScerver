@@ -125,4 +125,10 @@ public class HttpHandler implements ProtocolHandler {
 
 	}
 
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

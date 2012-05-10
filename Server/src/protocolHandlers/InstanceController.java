@@ -12,6 +12,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import Controllers.SimpleController;
 
@@ -26,16 +27,31 @@ public class InstanceController implements Caller, ProtocolHandler {
 	InetSocketAddress registry;
 	boolean registered;
 	ResponseDirector intermediary;
+	ConcurrentLinkedQueue<ReceivedData> queue;
 
 	public InstanceController(InetSocketAddress inetSocketAddress, ResponseDirector r) {
 		registry = inetSocketAddress;
 		registered = false;
 		intermediary = r;
+		queue = new ConcurrentLinkedQueue<ReceivedData>();
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		while(true) {
+			ReceivedData r = null;
+			synchronized(queue){
+				while(queue.isEmpty()) {
+					try {
+						queue.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				r = queue.poll();
+			}
+			eatData(r);
+
+		}
 
 	}
 
@@ -61,7 +77,10 @@ public class InstanceController implements Caller, ProtocolHandler {
 
 	@Override
 	public boolean parseData(ReceivedData d) {
-		eatData(d); //TODO:put in queue
+		synchronized (queue) {
+			queue.add(d);
+			queue.notify();	
+		}
 		return true;
 	}
 
@@ -77,6 +96,8 @@ public class InstanceController implements Caller, ProtocolHandler {
 		InstanceResponse response = new InstanceResponse();
 		switch (request.getMethod()) {
 		case CONTROLLER:
+			if (request.getController() == null)
+				throw new RuntimeException("what?");
 			if (intermediary.registerHttpRoute(request.getController(), "/")) {
 				response.setStatus(InstanceStatus.OK); 
 			} else {
