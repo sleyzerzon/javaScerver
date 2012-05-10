@@ -44,31 +44,34 @@ public class Server implements Runnable {
 			NetworkInterface ni;
 			InetAddress localIp = null;
 			actionQueue = new ConcurrentLinkedQueue<PendingAction>();
-			
+
 			if (!isChief) {
 				this.parentAddress = new InetSocketAddress(parentAddress, 9001);
 				port = Integer.valueOf(myPort);
 			}
-			
-			/*try {
+
+			try {
 				//find eth0
 				ni = NetworkInterface.getByName("eth0");
-				Enumeration<InetAddress> a = ni.getInetAddresses();
+				if (ni != null) {
+					Enumeration<InetAddress> a = ni.getInetAddresses();
 
-				while (a.hasMoreElements()){
-					a.nextElement();
-					localIp = a.nextElement();
+					while (a.hasMoreElements()){
+						a.nextElement();
+						localIp = a.nextElement();
+					}
 				}
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
-			localIp = InetAddress.getByName("localhost");
+			}
+			if (localIp == null)
+				localIp = InetAddress.getByName("localhost");
 			myAddress = new InetSocketAddress(localIp, port);
-			//System.out.println(myAddress);
+			System.out.println(myAddress);
 			selector = Selector.open();
 
-			
+
 			//setup server listening socket
 			ServerSocketChannel serverSocket = ServerSocketChannel.open();
 			serverSocket.configureBlocking(false);
@@ -80,8 +83,8 @@ public class Server implements Runnable {
 			//TODO: dependency inject
 			receiver = new ResponseDirector(isChief, this.parentAddress, this);
 			new Thread(receiver).start();
-			
-			
+
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
