@@ -93,8 +93,7 @@ public class InstanceController implements Caller, ProtocolHandler {
 			long avgRequestRate = Long.parseLong(heartBeat[0]);
 			boolean cull = Boolean.getBoolean(heartBeat[1]);
 			//System.out.println(avgRequestRate + ":" + cull);
-			if (cull)
-				intermediary.cullHttpConnections(avgRequestRate);
+			//intermediary.cullHttpConnections(avgRequestRate, cull);
 			sendStats(d);
 			break;
 

@@ -33,12 +33,19 @@ var newInstance = function() {
 
 
 var pulseInstance = function() {
-	if (instanceRoute === null)
+	if (instanceRoute === null || instanceRoute == "none")
 		return;
 	var xhr = new XMLHttpRequest();
 	var start = new Date().getTime();
 	xhr.onload = function(){
 		var response = eval('('+xhr.responseText+')');	
+		
+		if (response.drop == "true") {
+			
+			newInstance();
+			
+		}
+			
 		document.getElementById("latency").innerHTML = response.latency;
 		document.getElementById("requests").innerHTML = response.requests;
 		lastLatency = new Date().getTime() - start;
@@ -64,6 +71,9 @@ var halfInterval = function() {
 
 var start = function() {
 	newInstance();	
+	if (intervalID !== null)
+		window.clearInterval(intervalID);
+	
 	intervalID = window.setInterval(pulseInstance, timeDelay);
 };
 

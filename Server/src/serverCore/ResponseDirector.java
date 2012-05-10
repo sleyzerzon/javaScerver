@@ -125,6 +125,7 @@ public class ResponseDirector implements Callee {
 
 	public boolean registerHttpRoute(Class<? extends Controller> controller, String path) {
 		try {
+			System.out.println(controller+" shouldn't be null");
 			Controller c = controller.newInstance();
 			System.out.println(controller.getName()+":"+c.getResourcePath());
 			httpHander.registerController(c);
@@ -142,8 +143,8 @@ public class ResponseDirector implements Callee {
 		return httpHander.getStats();
 	}
 
-	public void cullHttpConnections(long avgRequestRate) {
-		httpHander.cullHttpConnections(avgRequestRate);
+	public void cullHttpConnections(long avgRequestRate, boolean enact) {
+		httpHander.cullHttpConnections(avgRequestRate, enact);
 		
 	}
 

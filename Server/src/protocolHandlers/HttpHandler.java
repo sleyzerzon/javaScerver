@@ -102,9 +102,17 @@ public class HttpHandler implements ProtocolHandler {
 		return stats;
 	}
 
-	public void cullHttpConnections(long avgRequestRate) {
+	public void cullHttpConnections(long avgRequestRate, boolean enact) {
+		long currentAvg =  getStats().getAvgLatency();
+		long ratio = 0;
+		if (currentAvg == 0) {
+			enact = false;
+		} else {
+			ratio = avgRequestRate/currentAvg;
+		}
+			
 		for(Controller controller : routes.values()) {
-			controller.cullConnections(avgRequestRate);
+			controller.cullConnections(ratio, enact);
 		}
 
 	}

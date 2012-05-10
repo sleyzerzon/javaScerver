@@ -20,6 +20,6 @@ public interface Controller {
 
 	public long getRequestCount();
 
-	public void cullConnections(long avgRequestRate);
+	public void cullConnections(long dropRatio, boolean enact);
 	
 }

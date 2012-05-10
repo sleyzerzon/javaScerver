@@ -8,6 +8,7 @@ import http.HttpStatus;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class JsonController implements Controller{
@@ -16,6 +17,9 @@ public class JsonController implements Controller{
 	final String resourcePath;
 	private long requestCount;
 	private ArrayList<Long> latencies;
+	private Random random;
+	private long dropRatio;
+	private boolean drop;
 
 	public JsonController() {
 		methods = new HashSet<HttpMethod>();
@@ -23,6 +27,9 @@ public class JsonController implements Controller{
 		resourcePath = "/";
 		requestCount = 0;
 		latencies = new ArrayList<Long>();
+		random = new Random();
+		dropRatio = 0;
+		drop = false;
 	}
 
 	@Override
@@ -62,16 +69,21 @@ public class JsonController implements Controller{
 		} catch (NumberFormatException e) {
 			avgLatency = 1;
 		}
+		boolean dropHere = false;
+		if (drop &&((float)random.nextInt(100)) < (dropRatio* 100))
+			dropHere = true;
+		
 		response.setMessage( 
-				"{ 'requests': '"+requestCount+"', 'latency':'"+avgLatency+"' }");
+				"{ 'requests': '"+requestCount+"', 'latency':'"+avgLatency+"', 'drop': '"+ dropHere +"' }");
 		return response;	
 	}
 	
 
 	@Override
-	public void cullConnections(long avgRequestRate) {
-		// TODO Auto-generated method stub
-
+	public void cullConnections(long dropRatio, boolean enact) {
+		this.dropRatio = dropRatio;
+		this.drop = enact;
+		latencies.clear();
 	}
 
 }

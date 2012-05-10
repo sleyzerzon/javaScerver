@@ -84,7 +84,7 @@ public class PageController implements Controller {
 	}
 
 	@Override
-	public void cullConnections(long avgRequestRate) {
+	public void cullConnections(long dropRatio, boolean enact) {
 		// TODO Auto-generated method stub
 
 	}

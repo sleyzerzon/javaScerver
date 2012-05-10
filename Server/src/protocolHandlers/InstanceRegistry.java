@@ -88,9 +88,18 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	 */
 	private void balanceLoad() {
 		//calculate load balance
-
+		long totalLatency = 0;
 		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
-			System.out.println(entry.getValue());
+			totalLatency += entry.getValue().getAvgLatency();
+		}
+		if (totalLatency == 0)
+			return;
+		avgRequestRate = totalLatency / instanceLatencies.size();
+		
+		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
+			if (entry.getValue().getAvgLatency() > (2 * totalLatency))
+				instanceResets.put(entry.getKey(), true);
+			else instanceResets.put(entry.getKey(), false);
 		}
 
 	}

@@ -75,9 +75,8 @@ public class SimpleController implements Controller {
 		return requestCount;
 	}
 	@Override
-	public void cullConnections(long avgRequestRate) {
-		// TODO Auto-generated method stub
-		
+	public void cullConnections(long dropRatio, boolean enact) {
+		//latencies.clear();
 	}
 
 }
