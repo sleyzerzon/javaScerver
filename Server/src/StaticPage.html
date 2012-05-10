@@ -13,17 +13,61 @@
 
 <script type="text/javascript">
 
+var instanceRoute = null;
+var timeDelay = 1000;
+var lastLatency = 0;
+var intervalID = null;
+
+
 var newInstance = function() {
 	var xhr = new XMLHttpRequest();
 	xhr.open("get", document.URL + "instance", true);
 	xhr.onload = function(){
 		var response = eval('('+xhr.responseText+')');	
 		document.getElementById("instanceName").innerHTML = response.instance;
+		instanceRoute = response.instance;
 	};
 	xhr.send();
 	
 };
-window.onload = newInstance;
+
+
+var pulseInstance = function() {
+	if (instanceRoute === null)
+		return;
+	var xhr = new XMLHttpRequest();
+	var start = new Date().getTime();
+	xhr.onload = function(){
+		var response = eval('('+xhr.responseText+')');	
+		document.getElementById("latency").innerHTML = response.latency;
+		document.getElementById("requests").innerHTML = response.requests;
+		lastLatency = new Date().getTime() - start;
+	};
+	
+	
+	xhr.open("get", "http://"+instanceRoute+"?avg="+lastLatency, true);
+	xhr.send();
+	 
+};
+
+var doubleInterval = function() {
+	timeDelay *= 2;
+	window.clearInterval(intervalID);
+	intervalID = window.setInterval(pulseInstance, timeDelay);
+};
+
+var halfInterval = function() {
+	timeDelay /= 2;
+	window.clearInterval(intervalID);
+	intervalID = window.setInterval(pulseInstance, timeDelay);
+};
+
+var start = function() {
+	newInstance();	
+	intervalID = window.setInterval(pulseInstance, timeDelay);
+};
+
+window.onload = start;
 
 </script>
 	
@@ -38,8 +82,8 @@ window.onload = newInstance;
 		<button type="button" onclick="newInstance()"> reroute </button></br>
 		<span style="text-decoration: underline; ">stats:</span> </br>
 		latency: <span id="latency"> 0 </span> </br>
-		requests/time: <span id="perTime"> 0 </span> </br>
-		change request frequency:   (<button type="button"> + </button>)/(<button type="button"> - </button>) </br>
+		requests: <span id="requests"> 0 </span> </br>
+		change request frequency:   (<button type="button" onclick="doubleInterval()"> + </button>)/(<button type="button" onclick="halfInterval()"> - </button>) </br>
 	</div>
 
 </body>

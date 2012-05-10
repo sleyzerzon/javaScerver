@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import Controllers.SimpleController;
+import Controllers.JsonController;
 
 import serverCore.ReceivedData;
 import serverCore.ResponseDirector;
@@ -126,7 +126,7 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			System.out.println(address);
 			intermediary.acceptAddress(address);
 			request = new InstanceRequest();
-			request.setController(SimpleController.class);
+			request.setController(JsonController.class);
 			request.setMethod(InstanceMethod.CONTROLLER);
 			intermediary.makeRequest(request, d, false);
 			/*if (request.getMethod() == InstanceMethod.GREET) {

@@ -34,7 +34,10 @@ public class HttpHandler implements ProtocolHandler {
 	}
 
 	public boolean registerController(Controller c) {
+		System.out.println("registering:"+c.getResourcePath() );
 		routes.put(c.getResourcePath(), c);
+		if (!routes.containsKey("/"))
+			throw new RuntimeException("whaa");
 		return true;
 	}
 
@@ -61,7 +64,7 @@ public class HttpHandler implements ProtocolHandler {
 		if (pageController != null){
 			response = pageController.handleRequest(request);
 		} else {
-			Controller c = routes.get(request.getUrl());
+			Controller c = routes.get(request.getPath());
 			if (c != null && c.getMethods().contains(request.getMethod())) {
 				response = c.handleRequest(request);
 			} else {

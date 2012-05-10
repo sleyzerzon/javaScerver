@@ -68,12 +68,10 @@ public class SimpleController implements Controller {
 	}
 	@Override
 	public Collection<? extends Long> getLatencies() {
-		// TODO Auto-generated method stub
 		return latencies;
 	}
 	@Override
 	public long getRequestCount() {
-		// TODO Auto-generated method stub
 		return requestCount;
 	}
 	@Override

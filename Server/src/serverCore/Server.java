@@ -65,7 +65,7 @@ public class Server implements Runnable {
 			}*/
 			localIp = InetAddress.getByName("localhost");
 			myAddress = new InetSocketAddress(localIp, port);
-			System.out.println(myAddress);
+			//System.out.println(myAddress);
 			selector = Selector.open();
 
 			
@@ -171,11 +171,11 @@ public class Server implements Runnable {
 	}
 
 	private void writeToSelection(SelectionKey key) throws IOException {
-		System.out.println("writing");
+		//System.out.println("writing");
 		PendingWrite w = (PendingWrite)key.attachment();
 		writeBuff.clear();
 		writeBuff.put(w.data);
-		System.out.println(w.data.length);
+		//System.out.println(w.data.length);
 		writeBuff.flip();
 		((SocketChannel)key.channel()).write(writeBuff);
 		if (w.terminates){
@@ -187,13 +187,13 @@ public class Server implements Runnable {
 	}
 
 	private int readFromSelection(SelectionKey key) throws IOException {
-		System.out.println("reading");
+		//System.out.println("reading");
 		readBuff.clear();
 		int count = ((SocketChannel)key.channel()).read(readBuff);
 		if (count == -1) {
 			key.channel().close();
 			key.cancel();
-			System.out.println("--CLOSED--");
+			//System.out.println("--CLOSED--");
 		} else {
 			receiver.pickupCall(this, key, readBuff.array(), count);
 		}
@@ -202,7 +202,7 @@ public class Server implements Runnable {
 
 	private SocketChannel acceptSelection(SelectionKey key) throws IOException,
 	ClosedChannelException {
-		System.out.println("accepting");
+		//System.out.println("accepting");
 		SocketChannel pending = ((ServerSocketChannel)key.channel()).accept();
 		pending.configureBlocking(false);
 		pending.register(selector, SelectionKey.OP_READ);

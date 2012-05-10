@@ -123,4 +123,9 @@ public class HttpRequest {
 			
 		return queries;
 	}
+
+	public Object getPath() {
+		// TODO Auto-generated method stub
+		return url.split("\\?")[0];
+	}
 }
