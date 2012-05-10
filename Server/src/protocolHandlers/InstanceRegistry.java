@@ -32,6 +32,7 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	ResponseDirector intermediary;
 	private static final long timeout = 1000;
 	private long avgRequestRate;
+	private InstanceRequest controllerRequest;
 
 	public InstanceRegistry(ResponseDirector intermediary) {
 		queue = new ConcurrentLinkedQueue<ReceivedData>();
@@ -44,6 +45,9 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 	@Override
 	public void run() {
 
+		controllerRequest = new InstanceRequest();
+		controllerRequest.setController(JsonController.class);
+		controllerRequest.setMethod(InstanceMethod.CONTROLLER);
 		while(true) {
 
 			try {
@@ -98,7 +102,7 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 		int i = 0;
 		for (Entry<SelectionKey, InstanceStats> entry : instanceLatencies.entrySet()) {
 			System.out.println(i++ + ", " + entry.getValue());
-			if (entry.getValue().getAvgLatency() > (2 * totalLatency))
+			if (entry.getValue().getAvgLatency() > (2 * avgRequestRate))
 				instanceResets.put(entry.getKey(), true);
 			else instanceResets.put(entry.getKey(), false);
 		}
@@ -136,10 +140,7 @@ public class InstanceRegistry implements ProtocolHandler, Runnable {
 			String address = new String(request.getBody());
 			System.out.println(address);
 			intermediary.acceptAddress(address);
-			request = new InstanceRequest();
-			request.setController(JsonController.class);
-			request.setMethod(InstanceMethod.CONTROLLER);
-			intermediary.makeRequest(request, d, false);
+			intermediary.makeRequest(controllerRequest, d, false);
 			/*if (request.getMethod() == InstanceMethod.GREET) {
 
 				response.setStatus(InstanceStatus.OK);

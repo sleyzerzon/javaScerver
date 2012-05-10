@@ -110,15 +110,15 @@ public class ResponseDirector implements Callee {
 	}
 
 	public void acceptReponse(InstanceResponse response, ReceivedData d, boolean b) {
-		server.sendData(d.key, response.getBytes(), b);
+		server.sendData(d.key, response.getBytes().clone(), b);
 	}
 	
 	public void makeRequest(InstanceRequest request, ReceivedData d, boolean b) {
-		server.sendData(d.key, request.getBytes(), b);
+		server.sendData(d.key, request.getBytes().clone(), b);
 	}
 	
 	public void makeRequest(InstanceRequest request, SelectionKey key, boolean b) {
-		server.sendData(key, request.getBytes(), b);
+		server.sendData(key, request.getBytes().clone(), b);
 	}
 
 	public boolean registerHttpRoute(Class<? extends Controller> controller, String path) {

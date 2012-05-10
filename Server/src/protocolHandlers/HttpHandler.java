@@ -77,20 +77,21 @@ public class HttpHandler implements ProtocolHandler {
 	}
 
 	public InstanceStats getStats() {
-		InstanceStats stats = new InstanceStats();
-		ArrayList<Long> latencies = new ArrayList<Long>();
+		
 		long requestCount = 0;
 		long totalLatency = 0;
 		long maxLatency = 0;
+		InstanceStats stats;
 		for(Controller controller : routes.values()) {
-			latencies.addAll(controller.getLatencies());
-			requestCount += controller.getRequestCount();
+		//	latencies.addAll(controller.getLatencies());
+			stats =  controller.getStats();
+			if (stats.getMaxLatency() > maxLatency)
+				maxLatency = stats.getMaxLatency();
+			totalLatency += stats.getAvgLatency();
+			requestCount += stats.getRequestsPerTime();
+			controller.resetStats();
 		}
-		for (Long latency : latencies) {
-			if (latency > maxLatency)
-				maxLatency = latency;
-			totalLatency += latency;
-		}
+		stats = new InstanceStats();
 		stats.setRequestsPerTime(requestCount);
 		if (requestCount > 0) {
 			stats.setAvgLatency(totalLatency/requestCount);

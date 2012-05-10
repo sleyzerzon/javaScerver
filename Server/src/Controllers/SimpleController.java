@@ -1,5 +1,7 @@
 package Controllers;
 
+import instanceProtocol.InstanceStats;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -66,17 +68,19 @@ public class SimpleController implements Controller {
 		}
 		else return false;
 	}
+	
 	@Override
-	public Collection<? extends Long> getLatencies() {
-		return latencies;
-	}
-	@Override
-	public long getRequestCount() {
-		return requestCount;
+	public InstanceStats getStats() {
+		return null;
 	}
 	@Override
 	public void cullConnections(long dropRatio, boolean enact) {
 		//latencies.clear();
+	}
+	@Override
+	public void resetStats() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -4,6 +4,7 @@ import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
+import instanceProtocol.InstanceStats;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -78,16 +79,11 @@ public class PageController implements Controller {
 		return response;	
 	}
 
-	@Override
-	public Collection<? extends Long> getLatencies() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
-	public long getRequestCount() {
+	public InstanceStats getStats() {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override
@@ -105,5 +101,11 @@ public class PageController implements Controller {
 			instances.add(hostAddress.substring(10));
 		else instances.add(hostAddress);
 
+	}
+
+	@Override
+	public void resetStats() {
+		// TODO Auto-generated method stub
+		
 	}
 }

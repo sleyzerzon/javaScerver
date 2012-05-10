@@ -3,6 +3,7 @@ package Controllers;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
+import instanceProtocol.InstanceStats;
 
 import java.util.Collection;
 import java.util.Set;
@@ -16,10 +17,10 @@ public interface Controller {
 	
 	public HttpResponse handleRequest(HttpRequest r);
 
-	public Collection<? extends Long> getLatencies();
-
-	public long getRequestCount();
+	public InstanceStats getStats();
 
 	public void cullConnections(long dropRatio, boolean enact);
+
+	void resetStats();
 	
 }

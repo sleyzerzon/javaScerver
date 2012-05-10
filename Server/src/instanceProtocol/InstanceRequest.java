@@ -27,15 +27,14 @@ public class InstanceRequest {
 	private InstanceMethod method;
 	private Class<? extends Controller> controller;
 	private byte[] body;
-	private static InstanceClassLoader cl = new InstanceClassLoader();
+	private byte[] cache = null;
 	public InstanceRequest() {
 		method = null;
 		controller = null;
 	}
 
-	public synchronized InstanceRequest fromBytes(byte[] data) {
+	public synchronized void fromBytes(byte[] data) {
 
-		InstanceRequest request = this;
 		ByteArrayInputStream  in = new ByteArrayInputStream(data);
 		InputStreamReader readMethod = new InputStreamReader(in);
 		char c;
@@ -46,28 +45,29 @@ public class InstanceRequest {
 				builder.append((char)c);
 				offset++;
 			}
-			request.method = InstanceMethod.valueOf(builder.toString());
+			method = InstanceMethod.valueOf(builder.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		Class<? extends Controller> cont = null;
-		switch (request.method) {
+		switch (method) {
 		case GREET:
-			request.body = new byte[data.length - offset];
-			System.arraycopy(data, offset, request.body, 0, request.body.length);
+			body = new byte[data.length - offset];
+			System.arraycopy(data, offset, body, 0, body.length);
 			break;
 
 		case HEARTBEAT:
-			request.body = new byte[data.length - offset];
-			System.arraycopy(data, offset, request.body, 0, request.body.length);
+			body = new byte[data.length - offset];
+			System.arraycopy(data, offset, body, 0, body.length);
 			break;
 
 		case CONTROLLER:
 			
 			try {
-				cont = cl.parseController(data, offset);
+				System.out.println("data size:"+(data.length - offset));
+				controller = new InstanceClassLoader().parseController(data, offset);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -76,12 +76,11 @@ public class InstanceRequest {
 		default:
 			break;
 		}
-		request.controller = cont;
-
-		return request;
 	}
 
 	public synchronized byte[] getBytes() {
+		if (cache != null)
+			return cache.clone();
 		// TODO Auto-generated method stub
 		byte[] m = (method.toString() + '\n').getBytes();
 
@@ -92,6 +91,7 @@ public class InstanceRequest {
 		switch (method) {
 
 		case CONTROLLER:
+			System.out.println("class length:"+body.length);
 			c = body;
 			break;
 
@@ -112,7 +112,8 @@ public class InstanceRequest {
 		if (c.length > 0)
 			System.arraycopy(c, 0, all, m.length, c.length);
 
-		return all;
+		cache = all;
+		return all.clone();
 
 	}
 
@@ -124,7 +125,10 @@ public class InstanceRequest {
 			String location = controller.getName().replaceAll("\\.", systemSlash)+".class";
 			System.out.println("location:" + location);
 			//URL path = Thread.currentThread().getContextClassLoader().getSystemResource(location);
-			InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
+			InputStream stream;
+			synchronized(InstanceRequest.class) {
+				stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
+			}
 			try {
 				//System.out.println("controller path:" + path);
 				//File file = new File(URLDecoder.decode(path.getFile(), "UTF-8"));
@@ -132,7 +136,7 @@ public class InstanceRequest {
 
 				DataInputStream dis = new DataInputStream(stream);
 				c = new byte[dis.available()];
-				System.out.println("class length is:"+c.length);
+				//System.out.println("class length is:"+c.length);
 				dis.readFully(c);
 				return c;
 			} catch (FileNotFoundException e) {
@@ -168,7 +172,7 @@ public class InstanceRequest {
 		body = b;
 	}
 	
-	public byte[] getBody() {
+	public synchronized byte[] getBody() {
 		return body;
 	}
 	

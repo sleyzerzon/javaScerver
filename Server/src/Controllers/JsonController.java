@@ -4,6 +4,7 @@ import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
+import instanceProtocol.InstanceStats;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,14 +44,28 @@ public class JsonController implements Controller{
 		return methods;
 	}
 
-	@Override
-	public Collection<? extends Long> getLatencies() {
-		return latencies;
-	}
 
 	@Override
-	public long getRequestCount() {
-		return requestCount;
+	public InstanceStats getStats() {
+		InstanceStats stats = new InstanceStats();
+		ArrayList<Long> latencies = new ArrayList<Long>();
+		long totalLatency = 0;
+		long maxLatency = 0;
+
+		for (Long latency : latencies) {
+			if (latency > maxLatency)
+				maxLatency = latency;
+			totalLatency += latency;
+		}
+		stats.setRequestsPerTime(requestCount);
+		if (requestCount > 0) {
+			stats.setAvgLatency(totalLatency/requestCount);
+			stats.setMaxLatency(maxLatency); 
+		} else {
+			stats.setAvgLatency(0);
+			stats.setMaxLatency(0); 
+		}
+		return stats;
 	}
 
 	@Override
@@ -69,15 +84,18 @@ public class JsonController implements Controller{
 		} catch (NumberFormatException e) {
 			avgLatency = 1;
 		}
+		
+		InstanceStats stats = getStats();
+		
 		boolean dropHere = false;
 		if (drop &&((float)random.nextInt(100)) < (dropRatio* 100))
 			dropHere = true;
 		
 		response.setMessage( 
-				"{ 'requests': '"+requestCount+"', 'latency':'"+avgLatency+"', 'drop': '"+ dropHere +"' }");
+				"{ 'requests': '"+stats.getRequestsPerTime()+"', 'latency':'"+stats.getAvgLatency()+"', 'drop': '"+ dropHere +"' }");
 		
 		long time = System.nanoTime();
-		while(System.nanoTime() < time + (30000000))
+		while(System.nanoTime() < time + (30000000)) //30 milliseconds
 			;
 		return response;	
 	}
@@ -87,6 +105,10 @@ public class JsonController implements Controller{
 	public void cullConnections(long dropRatio, boolean enact) {
 		this.dropRatio = dropRatio;
 		this.drop = enact;
+	}
+	
+	@Override
+	public void resetStats() {
 		latencies.clear();
 	}
 
